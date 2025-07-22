@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Leave Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-brand { font-weight: bold; }
+        .card { box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); border: 1px solid rgba(0, 0, 0, 0.125); }
+        .btn { border-radius: 0.25rem; }
+        .form-control { border-radius: 0.25rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'leave:dashboard' %}">
+                <i class="fas fa-building mr-2"></i>Company Leave Management
+            </a>
+            
+            {% if user.is_authenticated %}
+                <div class="navbar-nav ml-auto">
+                    <span class="navbar-text mr-3">
+                        <i class="fas fa-user mr-1"></i>
+                        Welcome, {{ user.get_full_name|default:user.username }}
+                    </span>
+                    <a href="{% url 'leave:dashboard' %}" class="nav-link">
+                        <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
+                    </a>
+                    <a href="{% url 'leave:logout' %}" class="nav-link">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </a>
+                </div>
+            {% else %}
+                <div class="navbar-nav ml-auto">
+                    <a href="{% url 'leave:login' %}" class="nav-link">
+                        <i class="fas fa-sign-in-alt mr-1"></i>Login
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {% if message.tags == 'success' %}<i class="fas fa-check-circle mr-2"></i>{% endif %}
+                    {% if message.tags == 'error' %}<i class="fas fa-exclamation-triangle mr-2"></i>{% endif %}
+                    {% if message.tags == 'warning' %}<i class="fas fa-exclamation-circle mr-2"></i>{% endif %}
+                    {% if message.tags == 'info' %}<i class="fas fa-info-circle mr-2"></i>{% endif %}
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

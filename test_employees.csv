@@ -1,0 +1,4 @@
+username,email,first_name,last_name,date_joined,region,is_staff,annual_leave_balance,sick_leave_balance
+john.doe,john.doe@company.com,John,Doe,2024-01-15,HK,False,14,5
+jane.smith,jane.smith@company.com,Jane,Smith,2023-06-01,CN,False,20,7
+mike.johnson,mike.johnson@company.com,Mike,Johnson,2024-03-10,HK,True,18,8

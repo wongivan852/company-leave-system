@@ -1,0 +1,353 @@
+{% extends "leave/base.html" %}
+
+{% block title %}Login - Leave Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-circle"></i> Login
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="{{ form.username.id_for_label }}">
+                                <i class="fas fa-envelope"></i> Email Address
+                            </label>
+                            <input type="email" 
+                                   name="{{ form.username.name }}" 
+                                   id="{{ form.username.id_for_label }}"
+                                   class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                                   placeholder="Enter your email address"
+                                   value="{{ form.username.value|default:'' }}"
+                                   required>
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.username.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.password.id_for_label }}">
+                                <i class="fas fa-lock"></i> Password
+                            </label>
+                            <input type="password" 
+                                   name="{{ form.password.name }}" 
+                                   id="{{ form.password.id_for_label }}"
+                                   class="form-control {% if form.password.errors %}is-invalid{% endif %}"
+                                   placeholder="Enter your password"
+                                   required>
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.password.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </form>
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger mt-3">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-muted">
+                        Don't have an account? 
+                        <a href="#" data-toggle="modal" data-target="#registerModal" class="text-primary">
+                            Register here
+                        </a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Registration Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="registerModalLabel">
+                    <i class="fas fa-user-plus"></i> Create New Account
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'leave:register' %}" id="registerForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="id_email">
+                                    <i class="fas fa-envelope"></i> Email Address *
+                                </label>
+                                <input type="email" name="email" id="id_email" class="form-control" 
+                                       placeholder="your.email@company.com" required>
+                                <small class="form-text text-muted">This will be used as your login email.</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_first_name">
+                                    <i class="fas fa-user"></i> First Name *
+                                </label>
+                                <input type="text" name="first_name" id="id_first_name" class="form-control" 
+                                       placeholder="First name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_last_name">
+                                    <i class="fas fa-user"></i> Last Name *
+                                </label>
+                                <input type="text" name="last_name" id="id_last_name" class="form-control" 
+                                       placeholder="Last name" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_password1">
+                                    <i class="fas fa-lock"></i> Password *
+                                </label>
+                                <input type="password" name="password1" id="id_password1" class="form-control" 
+                                       placeholder="Enter password" required>
+                                <small class="form-text text-muted">Must be at least 8 characters long.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_password2">
+                                    <i class="fas fa-lock"></i> Confirm Password *
+                                </label>
+                                <input type="password" name="password2" id="id_password2" class="form-control" 
+                                       placeholder="Confirm password" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_date_joined">
+                                    <i class="fas fa-calendar"></i> Employment Start Date *
+                                </label>
+                                <input type="date" name="date_joined" id="id_date_joined" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_region">
+                                    <i class="fas fa-map-marker-alt"></i> Region *
+                                </label>
+                                <select name="region" id="id_region" class="form-control" required>
+                                    <option value="HK">Hong Kong</option>
+                                    <option value="CN">China</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Note:</strong> Your email address will be used as your login credential. After registration, your leave entitlements will be automatically calculated based on your employment start date and region.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation for registration
+document.addEventListener('DOMContentLoaded', function() {
+    const registerForm = document.getElementById('registerForm');
+    
+    registerForm.addEventListener('submit', function(e) {
+        const password1 = document.getElementById('id_password1').value;
+        const password2 = document.getElementById('id_password2').value;
+        const submitBtn = this.querySelector('button[type="submit"]');
+        
+        // Reset any previous error styling
+        document.querySelectorAll('#registerModal .form-control').forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+        
+        // Remove any existing error alerts
+        const existingAlert = document.querySelector('#registerModal .alert-danger');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+        
+        let hasErrors = false;
+        let errorMessages = [];
+        
+        // Validate required fields
+        const requiredFields = [
+            { id: 'id_email', name: 'Email' },
+            { id: 'id_first_name', name: 'First Name' },
+            { id: 'id_last_name', name: 'Last Name' },
+            { id: 'id_date_joined', name: 'Employment Start Date' }
+        ];
+        
+        requiredFields.forEach(field => {
+            const element = document.getElementById(field.id);
+            if (element) {
+                const value = element.value.trim();
+                if (!value) {
+                    element.classList.add('is-invalid');
+                    errorMessages.push(`${field.name} is required`);
+                    hasErrors = true;
+                }
+            }
+        });
+        
+        // Validate email format
+        const email = document.getElementById('id_email').value.trim();
+        if (email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('id_email').classList.add('is-invalid');
+                errorMessages.push('Please enter a valid email address');
+                hasErrors = true;
+            }
+        }
+        
+        // Validate passwords
+        if (password1 && password2) {
+            if (password1 !== password2) {
+                document.getElementById('id_password1').classList.add('is-invalid');
+                document.getElementById('id_password2').classList.add('is-invalid');
+                errorMessages.push('Passwords do not match');
+                hasErrors = true;
+            }
+            
+            if (password1.length < 8) {
+                document.getElementById('id_password1').classList.add('is-invalid');
+                errorMessages.push('Password must be at least 8 characters long');
+                hasErrors = true;
+            }
+        } else {
+            if (!password1) {
+                document.getElementById('id_password1').classList.add('is-invalid');
+                errorMessages.push('Password is required');
+                hasErrors = true;
+            }
+            if (!password2) {
+                document.getElementById('id_password2').classList.add('is-invalid');
+                errorMessages.push('Password confirmation is required');
+                hasErrors = true;
+            }
+        }
+        
+        if (hasErrors) {
+            e.preventDefault();
+            showErrors(errorMessages);
+            return false;
+        } else {
+            // Show loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            submitBtn.disabled = true;
+        }
+    });
+});
+
+function showErrors(messages) {
+    // Create error alert with all messages
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+    
+    let errorHtml = '<i class="fas fa-exclamation-triangle"></i> Please fix the following errors:<ul class="mb-0 mt-2">';
+    messages.forEach(message => {
+        errorHtml += `<li>${message}</li>`;
+    });
+    errorHtml += '</ul>';
+    errorHtml += `
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    `;
+    
+    alertDiv.innerHTML = errorHtml;
+    
+    // Insert at the top of modal body
+    const modalBody = document.querySelector('#registerModal .modal-body');
+    modalBody.insertBefore(alertDiv, modalBody.firstChild);
+    
+    // Scroll to top of modal
+    modalBody.scrollTop = 0;
+}
+
+// Reset form when modal is opened
+$('#registerModal').on('show.bs.modal', function () {
+    const form = document.getElementById('registerForm');
+    form.reset();
+    document.querySelectorAll('#registerModal .form-control').forEach(input => {
+        input.classList.remove('is-invalid');
+    });
+    document.querySelectorAll('#registerModal .alert').forEach(alert => {
+        alert.remove();
+    });
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+    submitBtn.disabled = false;
+});
+
+// Reset form when modal is closed
+$('#registerModal').on('hidden.bs.modal', function () {
+    const form = document.getElementById('registerForm');
+    form.reset();
+    document.querySelectorAll('#registerModal .form-control').forEach(input => {
+        input.classList.remove('is-invalid');
+    });
+    document.querySelectorAll('#registerModal .alert').forEach(alert => {
+        alert.remove();
+    });
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+    submitBtn.disabled = false;
+});
+</script>
+{% endblock %}

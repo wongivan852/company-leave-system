@@ -1,0 +1,343 @@
+{% extends "leave/base.html" %}
+
+{% block title %}Holiday Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-calendar-alt mr-2"></i> Public Holiday Management</h2>
+                <a href="{% url 'leave:dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row">
+                        <div class="col-md-4">
+                            <label for="year" class="form-label">Year</label>
+                            <select name="year" id="year" class="form-control" onchange="this.form.submit()">
+                                {% for y in years %}
+                                <option value="{{ y }}" {% if y == current_year %}selected{% endif %}>{{ y }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="region" class="form-label">Region</label>
+                            <select name="region" id="region" class="form-control" onchange="this.form.submit()">
+                                {% for value, label in regions %}
+                                <option value="{{ value }}" {% if value == current_region %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#importModal">
+                                <i class="fas fa-download mr-1"></i> Import Holidays
+                            </button>
+                            <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#addModal">
+                                <i class="fas fa-plus mr-1"></i> Add Holiday
+                            </button>
+                            <button type="button" class="btn btn-info mr-2" data-toggle="modal" data-target="#employeeImportModal">
+                                <i class="fas fa-users mr-1"></i> Import Employees
+                            </button>
+                            <a href="{% url 'leave:import_history' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-history mr-1"></i> Import History
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Holidays Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list mr-2"></i>
+                        Holidays for {{ current_region }} {{ current_year }}
+                        <span class="badge badge-primary ml-2">{{ holidays.count }} holidays</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if holidays %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Holiday Name</th>
+                                    <th>Region</th>
+                                    <th>Status</th>
+                                    <th>Source</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for holiday in holidays %}
+                                <tr>
+                                    <td>{{ holiday.date|date:"M d, Y" }}</td>
+                                    <td>{{ holiday.name }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ holiday.region }}</span>
+                                    </td>
+                                    <td>
+                                        {% if holiday.is_active %}
+                                            <span class="badge badge-success">Active</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if holiday.is_imported %}
+                                            <span class="badge badge-primary">Imported</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">Custom</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'leave:holiday_edit' holiday.id %}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                    onclick="confirmDelete({{ holiday.id }}, '{{ holiday.name }}')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No holidays found for {{ current_region }} {{ current_year }}</h5>
+                        <p class="text-muted">Click "Import Holidays" to load holidays from the system library.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Holidays</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'leave:holiday_import' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="import_year">Year</label>
+                        <input type="number" class="form-control" id="import_year" name="year" value="{{ current_year }}" min="2020" max="2030" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="import_region">Region</label>
+                        <select class="form-control" id="import_region" name="region" required>
+                            {% for value, label in regions %}
+                            <option value="{{ value }}" {% if value == current_region %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="overwrite" name="overwrite" value="true">
+                        <label class="form-check-label" for="overwrite">
+                            Overwrite existing imported holidays
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Import Holidays</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Holiday Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Custom Holiday</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'leave:holiday_add' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="add_name">Holiday Name</label>
+                        <input type="text" class="form-control" id="add_name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add_date">Date</label>
+                        <input type="date" class="form-control" id="add_date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add_region">Region</label>
+                        <select class="form-control" id="add_region" name="region" required>
+                            {% for value, label in regions %}
+                            <option value="{{ value }}" {% if value == current_region %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Holiday</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Employee Import Modal -->
+<div class="modal fade" id="employeeImportModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Employee Data</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'leave:employee_import' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle mr-2"></i>CSV Format Instructions</h6>
+                        <p class="mb-2">Please ensure your CSV file contains the following columns:</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Required Fields:</strong>
+                                <ul class="small mb-2">
+                                    <li><code>username</code> - Unique username</li>
+                                    <li><code>email</code> - Employee email</li>
+                                    <li><code>first_name</code> - First name</li>
+                                    <li><code>last_name</code> - Last name</li>
+                                    <li><code>date_joined</code> - Join date (YYYY-MM-DD)</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Optional Fields:</strong>
+                                <ul class="small mb-2">
+                                    <li><code>region</code> - HK or CN (default: HK)</li>
+                                    <li><code>is_staff</code> - true/false (default: false)</li>
+                                    <li><code>annual_leave_balance</code> - Days available</li>
+                                    <li><code>sick_leave_balance</code> - Days available</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="downloadSampleCSV()">
+                            <i class="fas fa-download mr-1"></i> Download Sample CSV
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="employee_file">Select CSV File</label>
+                        <input type="file" class="form-control-file" id="employee_file" name="employee_file" accept=".csv" required>
+                        <small class="form-text text-muted">Only CSV files are supported. Maximum file size: 5MB</small>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="update_existing" name="update_existing" value="true" checked>
+                        <label class="form-check-label" for="update_existing">
+                            Update existing employees with new data
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-upload mr-1"></i> Import Employees
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Form (hidden) -->
+<form id="deleteForm" method="post" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<script>
+function confirmDelete(holidayId, holidayName) {
+    if (confirm(`Are you sure you want to delete "${holidayName}"?`)) {
+        const form = document.getElementById('deleteForm');
+        form.action = `/holidays/${holidayId}/delete/`;
+        form.submit();
+    }
+}
+
+function downloadSampleCSV() {
+    const csvContent = `username,email,first_name,last_name,date_joined,region,is_staff,annual_leave_balance,sick_leave_balance
+john.doe,john.doe@company.com,John,Doe,2023-01-15,HK,false,14,7
+jane.smith,jane.smith@company.com,Jane,Smith,2022-05-20,CN,true,18,7
+mike.wang,mike.wang@company.com,Mike,Wang,2021-03-10,HK,false,21,7`;
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'employee_import_sample.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Debug modal functionality
+$(document).ready(function() {
+    console.log('Holiday management page loaded');
+    
+    // Test modal triggers
+    $('[data-toggle="modal"]').on('click', function() {
+        const target = $(this).attr('data-target');
+        console.log('Modal trigger clicked, target:', target);
+    });
+    
+    {% if messages %}
+        console.log('Messages detected, hiding modals');
+        $('#importModal').modal('hide');
+        $('#addModal').modal('hide');
+        $('#employeeImportModal').modal('hide');
+    {% endif %}
+});
+</script>
+
+<style>
+.table th {
+    background-color: #f8f9fa;
+    border-top: none;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.btn-group .btn {
+    margin-right: 2px;
+}
+
+.card-header h5 {
+    margin-bottom: 0;
+}
+</style>
+
+{% endblock %}

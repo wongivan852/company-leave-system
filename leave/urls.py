@@ -1,0 +1,34 @@
+from django.urls import path
+from django.shortcuts import redirect
+from . import views, views_auth
+
+app_name = "leave"
+
+def redirect_to_dashboard(request):
+    return redirect('leave:dashboard')
+
+urlpatterns = [
+    path("", redirect_to_dashboard, name="home"),
+    path("login/", views_auth.CustomLoginView.as_view(), name="login"),
+    path("logout/", views_auth.CustomLogoutView.as_view(), name="logout"),
+    path("register/", views_auth.register, name="register"),
+    path("dashboard/", views_auth.dashboard, name="dashboard"),
+    path("apply-leave/", views.apply_leave, name="apply_leave"),
+    path("apply-leave/confirm/", views.apply_leave_confirm, name="apply_leave_confirm"),
+    path("leave-applications/", views.leave_applications, name="leave_applications"),
+    path("leave-applications/<int:application_id>/", views.leave_application_detail, name="leave_application_detail"),
+    path("leave-applications/<int:application_id>/revise/", views.revise_leave_application, name="revise_leave_application"),
+    path("leave-applications/<int:application_id>/withdraw/", views.withdraw_leave_application, name="withdraw_leave_application"),
+    path("holidays/", views.holiday_management, name="holiday_management"),
+    path("holidays/import/", views.holiday_import, name="holiday_import"),
+    path("holidays/add/", views.holiday_add, name="holiday_add"),
+    path("employees/import/", views.employee_import, name="employee_import"),
+    path("employees/import/history/", views.import_history, name="import_history"),
+    path("employees/import/<int:import_id>/view/", views.view_import_content, name="view_import_content"),
+    path("employees/download-balances/", views.download_balances, name="download_balances"),
+    path("special-work-claim/", views.special_work_claim, name="special_work_claim"),
+    path("special-leave-apply/", views.special_leave_apply, name="special_leave_apply"),
+    path("special-leave-management/", views.special_leave_management, name="special_leave_management"),
+    path("holidays/<int:holiday_id>/edit/", views.holiday_edit, name="holiday_edit"),
+    path("holidays/<int:holiday_id>/delete/", views.holiday_delete, name="holiday_delete"),
+]

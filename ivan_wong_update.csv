@@ -1,0 +1,6 @@
+username,email,first_name,last_name,date_joined,region,is_staff,annual_leave_balance,sick_leave_balance
+ivan_wong,ivan.wong@krystal.technology,Ivan,Wong,2025-07-20,HK,true,14,7
+krystal,ivan.wong@krystal.institute,Ivan,Wong,2020-01-15,HK,true,13.5,0
+tim,tim.tan@krystal.technology,Tim,Tan,2025-07-20,CN,true,14,7
+jeff,jeff.koo@krystal.technology,Jeff,Koo,2025-07-20,HK,true,14,7
+danny,danny.ng@krystal.technology,Danny,Lee,2025-07-20,HK,false,14,7

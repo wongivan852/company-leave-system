@@ -1,0 +1,339 @@
+{% extends "leave/base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-calendar-plus mr-2"></i>
+                        {% if is_revision %}Revise Leave Application{% else %}Apply for Leave{% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Navigation -->
+                    <div class="mb-3">
+                        {% if is_revision %}
+                            <a href="{% url 'leave:leave_application_detail' application.id %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-arrow-left"></i> Back to Application Details
+                            </a>
+                            <a href="{% url 'leave:dashboard' %}" class="btn btn-outline-primary btn-sm ml-2">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        {% else %}
+                            <a href="{% url 'leave:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <a href="{% url 'leave:leave_applications' %}" class="btn btn-outline-primary btn-sm ml-2">
+                                <i class="fas fa-list"></i> My Applications
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% if is_revision %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-edit mr-2"></i>
+                        <strong>Revising Application #{{ application.id }}</strong><br>
+                        Make your changes below and submit for confirmation. The application status will remain pending.
+                    </div>
+                    {% endif %}
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <strong>Please correct the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <!-- Display Saturday working day warning if present from server-side validation -->
+                    {% if form.cleaned_data.saturday_warning %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            {{ form.cleaned_data.saturday_warning }}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.leave_type.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-tag mr-1"></i>Leave Type: <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.leave_type }}
+                                    {% if form.leave_type.errors %}
+                                        <div class="text-danger small mt-1">{{ form.leave_type.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.start_date.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-calendar mr-1"></i>Start Date: <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.start_date }}
+                                    {% if form.start_date.errors %}
+                                        <div class="text-danger small mt-1">{{ form.start_date.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.start_time.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-clock mr-1"></i>Start Time: <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.start_time }}
+                                    <small class="form-text text-muted">AM = 9:00, PM = 13:00 (1:00 PM)</small>
+                                    {% if form.start_time.errors %}
+                                        <div class="text-danger small mt-1">{{ form.start_time.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.end_date.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-calendar mr-1"></i>End Date: <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.end_date }}
+                                    {% if form.end_date.errors %}
+                                        <div class="text-danger small mt-1">{{ form.end_date.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.end_time.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-clock mr-1"></i>End Time: <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.end_time }}
+                                    <small class="form-text text-muted">AM = 13:00 (1:00 PM), PM = 18:00 (6:00 PM)</small>
+                                    {% if form.end_time.errors %}
+                                        <div class="text-danger small mt-1">{{ form.end_time.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.reason.id_for_label }}" class="font-weight-bold">
+                                <i class="fas fa-comment mr-1"></i>Reason for Leave:
+                            </label>
+                            {{ form.reason }}
+                            {% if form.reason.errors %}
+                                <div class="text-danger small mt-1">{{ form.reason.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.certificate.id_for_label }}" class="font-weight-bold">
+                                <i class="fas fa-file-medical mr-1"></i>Medical Certificate/Supporting Document:
+                            </label>
+                            <small class="form-text text-muted mb-2">Optional - Upload for sick leave (JPEG, PNG, PDF)</small>
+                            {{ form.certificate }}
+                            {% if form.certificate.errors %}
+                                <div class="text-danger small mt-1">{{ form.certificate.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Saturday Working Day Notice -->
+                        <div id="saturday-notice" class="alert alert-warning" style="display: none;">
+                            <div class="font-weight-bold">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>Saturday as Working Day Notice
+                            </div>
+                            <div class="mt-2" id="saturday-notice-text">
+                                <!-- Notice text will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg mr-3">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                {% if is_revision %}Update Application{% else %}Submit Application{% endif %}
+                            </button>
+                            {% if is_revision %}
+                                <a href="{% url 'leave:leave_application_detail' application.id %}" class="btn btn-secondary btn-lg">
+                                    <i class="fas fa-times mr-2"></i>Cancel
+                                </a>
+                            {% else %}
+                                <a href="{% url 'leave:dashboard' %}" class="btn btn-secondary btn-lg">
+                                    <i class="fas fa-times mr-2"></i>Cancel
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle mr-2"></i>Holiday Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if profile and profile.region %}
+                        <h6 class="text-primary">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            {% if profile.region == 'HK' %}Hong Kong{% elif profile.region == 'CN' %}China{% else %}{{ profile.region }}{% endif %} Holidays
+                        </h6>
+                        
+                        {% if holidays %}
+                            <div class="mb-3">
+                                <small class="text-muted">Upcoming holidays this year:</small>
+                                <div style="max-height: 200px; overflow-y: auto;">
+                                    {% for holiday in holidays %}
+                                        <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+                                            <span class="small">{{ holiday.0 }}</span>
+                                            <span class="badge badge-light small">{{ holiday.1|date:"M d" }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <p class="text-muted small">No holiday data available.</p>
+                        {% endif %}
+                        
+                        {% if user.is_staff %}
+                            <a href="{% url 'leave:holiday_management' %}" class="btn btn-outline-primary btn-sm btn-block">
+                                <i class="fas fa-cog mr-1"></i>Manage Holidays
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-warning small">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            Please update your profile to view region-specific holidays.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb mr-2"></i>Leave Tips
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="small mb-0 pl-3">
+                        <li>Apply for leave at least 2 weeks in advance</li>
+                        <li>Upload medical certificates for sick leave</li>
+                        <li>Saturday is a working day - additional penalty applies</li>
+                        <li>Contact HR for urgent leave requests</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for real-time Saturday working day checking and weekend validation -->
+<script>
+function validateDateSelection() {
+    const startDate = document.getElementById('id_start_date').value;
+    const endDate = document.getElementById('id_end_date').value;
+    const noticeDiv = document.getElementById('saturday-notice');
+    const noticeText = document.getElementById('saturday-notice-text');
+    
+    // Clear any existing weekend error messages
+    const existingWeekendError = document.getElementById('weekend-error');
+    if (existingWeekendError) {
+        existingWeekendError.remove();
+    }
+    
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        // Check for weekends
+        let hasWeekend = false;
+        let currentDate = new Date(start);
+        
+        while (currentDate <= end) {
+            const dayOfWeek = currentDate.getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 6) { // Sunday or Saturday
+                hasWeekend = true;
+                break;
+            }
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        
+        if (hasWeekend) {
+            // Show weekend warning
+            const weekendError = document.createElement('div');
+            weekendError.id = 'weekend-error';
+            weekendError.style.cssText = 'background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; margin-bottom: 15px; border-radius: 5px; color: #721c24;';
+            weekendError.innerHTML = '<strong>⚠️ Weekend Selection:</strong><br>Your selected dates include weekend(s). Leave applications are typically for business days only. Please review your selection.';
+            
+            // Insert before the form
+            const form = document.querySelector('form');
+            form.parentNode.insertBefore(weekendError, form);
+        }
+        
+        if (start <= end && !hasWeekend) {
+            let fridayCount = 0;
+            currentDate = new Date(start);
+            
+            while (currentDate <= end) {
+                if (currentDate.getDay() === 5) { // Friday is day 5
+                    fridayCount++;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            if (fridayCount > 0) {
+                noticeText.innerHTML = `Your leave application includes <strong>${fridayCount} Friday(s)</strong>. According to company policy, Saturday(s) is viewed as working day(s) thus respective Saturday would be counted as annual leave application.`;
+                noticeDiv.style.display = 'block';
+            } else {
+                noticeDiv.style.display = 'none';
+            }
+        } else {
+            noticeDiv.style.display = 'none';
+        }
+    } else {
+        noticeDiv.style.display = 'none';
+    }
+}
+
+// Add event listeners when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateField = document.getElementById('id_start_date');
+    const endDateField = document.getElementById('id_end_date');
+    
+    if (startDateField && endDateField) {
+        startDateField.addEventListener('change', validateDateSelection);
+        endDateField.addEventListener('change', validateDateSelection);
+        
+        // Check on page load if dates are already filled
+        validateDateSelection();
+    }
+});
+</script>
+
+<div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+    <h4>Important Notes:</h4>
+    <ul>
+        <li>Minimum leave application is 0.5 day</li>
+        <li>All leave applications require manager approval</li>
+        <li>Medical certificate is required for sick leave over 3 days</li>
+        <li>Leave applications should be submitted at least 2 days in advance</li>
+    </ul>
+</div>
+
+{% endblock %}

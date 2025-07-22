@@ -1,0 +1,140 @@
+{% extends "leave/base.html" %}
+{% block content %}
+
+<h2>
+    {% if is_manager_view %}
+        All Leave Applications
+    {% else %}
+        My Leave Applications
+    {% endif %}
+</h2>
+
+<!-- Navigation Links -->
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'leave:dashboard' %}">← Back to Dashboard</a> |
+    <a href="{% url 'leave:apply_leave' %}">Apply for Leave</a>
+</div>
+
+<!-- Filters -->
+<form method="get" style="background: #f5f5f5; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: end;">
+        <div>
+            <label for="status">Status:</label><br>
+            <select name="status" id="status">
+                <option value="">All Statuses</option>
+                {% for choice_value, choice_label in status_choices %}
+                    <option value="{{ choice_value }}" {% if status_filter == choice_value %}selected{% endif %}>
+                        {{ choice_label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div>
+            <label for="leave_type">Leave Type:</label><br>
+            <select name="leave_type" id="leave_type">
+                <option value="">All Types</option>
+                {% for leave_type in leave_types %}
+                    <option value="{{ leave_type.name }}" {% if leave_type_filter == leave_type.name %}selected{% endif %}>
+                        {{ leave_type.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        {% if is_manager_view %}
+        <div>
+            <label for="search">Search Employee:</label><br>
+            <input type="text" name="search" id="search" value="{{ search }}" placeholder="Name or email">
+        </div>
+        {% endif %}
+        
+        <div>
+            <button type="submit">Filter</button>
+            <a href="{% url 'leave:leave_applications' %}" style="margin-left: 10px;">Clear</a>
+        </div>
+    </div>
+</form>
+
+<!-- Results Count -->
+<p>
+    <strong>{{ page_obj.paginator.count }}</strong> application{% if page_obj.paginator.count != 1 %}s{% endif %} found
+</p>
+
+<!-- Applications Table -->
+{% if applications %}
+<div style="overflow-x: auto;">
+    <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+        <thead style="background-color: #f0f0f0;">
+            <tr>
+                {% if is_manager_view %}
+                <th>Employee</th>
+                {% endif %}
+                <th>Leave Type</th>
+                <th>Date From</th>
+                <th>Date To</th>
+                <th>Days</th>
+                <th>Status</th>
+                <th>Applied On</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                {% if is_manager_view %}
+                <td>
+                    {{ app.employee.user.get_full_name|default:app.employee.user.username }}<br>
+                    <small style="color: #666;">{{ app.employee.user.email }}</small>
+                </td>
+                {% endif %}
+                <td>{{ app.leave_type.name }}</td>
+                <td>{{ app.date_from|date:"M d, Y H:i" }}</td>
+                <td>{{ app.date_to|date:"M d, Y H:i" }}</td>
+                <td>{{ app.days_applied }}</td>
+                <td>
+                    <span style="
+                        padding: 3px 8px; 
+                        border-radius: 3px; 
+                        font-size: 12px; 
+                        color: white;
+                        background-color: {% if app.status == 'approved' %}green{% elif app.status == 'rejected' %}red{% else %}orange{% endif %};
+                    ">
+                        {{ app.get_status_display }}
+                    </span>
+                </td>
+                <td>{{ app.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'leave:leave_application_detail' app.id %}">View Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div style="margin-top: 20px; text-align: center;">
+    <div>
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if leave_type_filter %}&leave_type={{ leave_type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if leave_type_filter %}&leave_type={{ leave_type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}">Previous</a>
+        {% endif %}
+        
+        <span>
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if leave_type_filter %}&leave_type={{ leave_type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if leave_type_filter %}&leave_type={{ leave_type_filter }}{% endif %}{% if search %}&search={{ search }}{% endif %}">Last &raquo;</a>
+        {% endif %}
+    </div>
+</div>
+
+{% else %}
+    <p>No leave applications found.</p>
+    <a href="{% url 'leave:apply_leave' %}" style="background: #007cba; color: white; padding: 10px 15px; text-decoration: none; border-radius: 3px;">Apply for Leave</a>
+{% endif %}
+
+{% endblock %}

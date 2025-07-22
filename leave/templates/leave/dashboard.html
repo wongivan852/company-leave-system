@@ -1,0 +1,360 @@
+{% extends "leave/base.html" %}
+{% block content %}
+
+<h2>Welcome to the Leave System Dashboard</h2>
+<p>You are logged in as {{ user.get_full_name|default:user.username }} ({{ user.email }})</p>
+
+{% if employee %}
+<!-- Employee Information -->
+<div style="background: #e3f2fd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+    <h3>Employee Information</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+        <div>
+            <strong>Date Joined:</strong> {{ employee.date_joined|date:"F d, Y" }}
+        </div>
+        <div>
+            <strong>Years of Service:</strong> {{ stats.years_of_service }} years
+        </div>
+        <div>
+            <strong>Applications This Year:</strong> {{ stats.total_applications_this_year }}
+        </div>
+    </div>
+</div>
+
+<!-- Annual Leave Details -->
+{% if annual_leave_details %}
+<div style="background: #e8f5e8; padding: 15px; margin-bottom: 20px; border-radius: 5px; border-left: 4px solid #4caf50;">
+    <h3 style="color: #2e7d32; margin-top: 0;">📊 Annual Leave Summary ({{ current_year }})</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+        <div style="background: white; padding: 12px; border-radius: 5px; border: 1px solid #c8e6c9;">
+            <div style="font-size: 24px; font-weight: bold; color: #1976d2;">{{ annual_leave_details.carried_forward }}</div>
+            <div style="color: #666; font-size: 14px;">Carried Forward from {{ current_year|add:"-1" }}</div>
+        </div>
+        <div style="background: white; padding: 12px; border-radius: 5px; border: 1px solid #c8e6c9;">
+            <div style="font-size: 24px; font-weight: bold; color: #388e3c;">{{ annual_leave_details.current_year_entitlement }}</div>
+            <div style="color: #666; font-size: 14px;">{{ current_year }} Entitlement</div>
+        </div>
+        <div style="background: white; padding: 12px; border-radius: 5px; border: 1px solid #c8e6c9;">
+            <div style="font-size: 24px; font-weight: bold; color: #f57c00;">{{ annual_leave_details.taken_this_year }}</div>
+            <div style="color: #666; font-size: 14px;">Taken from Jan 1, {{ current_year }}</div>
+        </div>
+        <div style="background: white; padding: 12px; border-radius: 5px; border: 1px solid #c8e6c9;">
+            <div style="font-size: 24px; font-weight: bold; color: {% if annual_leave_details.current_balance > 0 %}#4caf50{% elif annual_leave_details.current_balance == 0 %}#ff9800{% else %}#f44336{% endif %};">{{ annual_leave_details.current_balance }}</div>
+            <div style="color: #666; font-size: 14px;">Current Balance</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Leave Balances -->
+<div style="background: #f5f5f5; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+    <h3>Leave Balances ({{ current_year }})</h3>
+    <div style="overflow-x: auto;">
+        <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+            <thead style="background-color: #e0e0e0;">
+                <tr>
+                    <th>Leave Type</th>
+                    <th>Opening Balance</th>
+                    <th>Carried Forward</th>
+                    <th>Current Year Entitlement</th>
+                    <th>Taken</th>
+                    <th>Available Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave_type_name, balance in leave_balances.items %}
+                <tr>
+                    <td><strong>{{ leave_type_name }}</strong></td>
+                    <td>{{ balance.opening_balance }}</td>
+                    <td>{{ balance.carried_forward }}</td>
+                    <td>{{ balance.current_year_entitlement }}</td>
+                    <td>{{ balance.taken }}</td>
+                    <td style="
+                        font-weight: bold; 
+                        color: {% if balance.balance > 0 %}green{% elif balance.balance == 0 %}orange{% else %}red{% endif %};
+                    ">
+                        {{ balance.balance }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No leave balances found. Please contact HR.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Special Leave Balance -->
+<div style="background: #fff3cd; padding: 15px; margin-bottom: 20px; border-radius: 5px; border-left: 4px solid #ffc107;">
+    <h3 style="color: #856404; margin-top: 0;">⭐ Special Leave Credits</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+        <div style="background: white; padding: 12px; border-radius: 5px; border: 1px solid #ffeaa7;">
+            <div style="font-size: 24px; font-weight: bold; color: #e17055;">{{ special_leave_balance.earned|floatformat:1 }}</div>
+            <div style="color: #666; font-size: 14px;">Credits Earned</div>
+        </div>
+        <div style="background: white; padding: 12px; border-radius: 5px; border: 1px solid #ffeaa7;">
+            <div style="font-size: 24px; font-weight: bold; color: #636e72;">{{ special_leave_balance.used|floatformat:1 }}</div>
+            <div style="color: #666; font-size: 14px;">Credits Used</div>
+        </div>
+        <div style="background: white; padding: 12px; border-radius: 5px; border: 1px solid #ffeaa7;">
+            <div style="font-size: 24px; font-weight: bold; color: {% if special_leave_balance.balance > 0 %}#00b894{% elif special_leave_balance.balance == 0 %}#fdcb6e{% else %}#e17055{% endif %};">{{ special_leave_balance.balance|floatformat:1 }}</div>
+            <div style="color: #666; font-size: 14px;">Available Balance</div>
+        </div>
+    </div>
+    <div style="margin-top: 10px; font-size: 12px; color: #856404;">
+        <i class="fas fa-info-circle"></i> Earn credits by working beyond normal hours, use them for special leave requests.
+    </div>
+</div>
+
+<!-- Navigation Menu -->
+<div style="background: #f5f5f5; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+    <h3>Quick Actions</h3>
+    
+    <!-- Regular Leave Actions -->
+    <div style="margin-bottom: 15px;">
+        <strong style="color: #495057; font-size: 14px;">Regular Leave:</strong><br>
+        <a href="{% url 'leave:apply_leave' %}" style="background: #007cba; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-right: 10px; margin-top: 5px; display: inline-block;">
+            <i class="fas fa-calendar-plus"></i> Apply for Leave
+        </a>
+        <a href="{% url 'leave:leave_applications' %}" style="background: #28a745; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-right: 10px; margin-top: 5px; display: inline-block;">
+            <i class="fas fa-list"></i> {% if user.is_staff %}View All Applications{% else %}My Applications{% endif %}
+        </a>
+    </div>
+    
+    <!-- Special Leave Actions -->
+    <div style="margin-bottom: 15px;">
+        <strong style="color: #495057; font-size: 14px;">Special Leave:</strong><br>
+        <a href="{% url 'leave:special_work_claim' %}" style="background: #17a2b8; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-right: 10px; margin-top: 5px; display: inline-block;">
+            <i class="fas fa-plus-circle"></i> Claim Work Credits
+        </a>
+        <a href="{% url 'leave:special_leave_apply' %}" style="background: #fd7e14; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-right: 10px; margin-top: 5px; display: inline-block;">
+            <i class="fas fa-calendar-check"></i> Apply Special Leave
+        </a>
+        {% if user.is_staff %}
+        <a href="{% url 'leave:special_leave_management' %}" style="background: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-right: 10px; margin-top: 5px; display: inline-block;">
+            <i class="fas fa-tasks"></i> Manage Special Leave
+        </a>
+        {% endif %}
+    </div>
+    
+    <!-- Admin Actions -->
+    {% if user.is_staff %}
+    <div style="margin-bottom: 10px;">
+        <strong style="color: #495057; font-size: 14px;">Administration:</strong><br>
+        <a href="{% url 'leave:holiday_management' %}" style="background: #6f42c1; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-right: 10px; margin-top: 5px; display: inline-block;">
+            <i class="fas fa-calendar-alt"></i> Manage Holidays
+        </a>
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#downloadBalanceModal" style="padding: 8px 15px; margin-right: 10px; margin-top: 5px;">
+            <i class="fas fa-download"></i> Download Balances
+        </button>
+    </div>
+    {% endif %}
+    
+    <!-- Pending Applications Alerts -->
+    {% if stats.pending_applications > 0 %}
+    <span style="background: #ffc107; color: black; padding: 8px 15px; border-radius: 3px; margin-left: 10px; margin-top: 5px; display: inline-block;">
+        <i class="fas fa-clock"></i> {{ stats.pending_applications }} Pending Leave Application{% if stats.pending_applications != 1 %}s{% endif %}
+    </span>
+    {% endif %}
+    
+    {% if user.is_staff and stats.total_pending_special > 0 %}
+    <span style="background: #dc3545; color: white; padding: 8px 15px; border-radius: 3px; margin-left: 10px; margin-top: 5px; display: inline-block;">
+        <i class="fas fa-exclamation-triangle"></i> {{ stats.total_pending_special }} Pending Special Leave Item{% if stats.total_pending_special != 1 %}s{% endif %}
+        {% if stats.pending_special_claims > 0 and stats.pending_special_applications > 0 %}
+            ({{ stats.pending_special_claims }} claim{% if stats.pending_special_claims != 1 %}s{% endif %}, {{ stats.pending_special_applications }} application{% if stats.pending_special_applications != 1 %}s{% endif %})
+        {% elif stats.pending_special_claims > 0 %}
+            ({{ stats.pending_special_claims }} claim{% if stats.pending_special_claims != 1 %}s{% endif %})
+        {% else %}
+            ({{ stats.pending_special_applications }} application{% if stats.pending_special_applications != 1 %}s{% endif %})
+        {% endif %}
+    </span>
+    {% endif %}
+</div>
+
+<h3>Recent Leave Applications</h3>
+{% if applications %}
+<table border="1" cellpadding="5" style="width: 100%; border-collapse: collapse;">
+    <tr style="background-color: #f0f0f0;">
+        <th>Type</th>
+        <th>Date From</th>
+        <th>Date To</th>
+        <th>Days</th>
+        <th>Status</th>
+        <th>Reason</th>
+        <th>Certificate</th>
+        <th>Applied At</th>
+        <th>Actions</th>
+    </tr>
+    {% for app in applications|slice:":5" %}
+    <tr>
+        <td>{{ app.leave_type.name }}</td>
+        <td>{{ app.date_from|date:"Y-m-d H:i" }}</td>
+        <td>{{ app.date_to|date:"Y-m-d H:i" }}</td>
+        <td>{{ app.days_applied }}</td>
+        <td>
+            <span style="
+                padding: 3px 8px; 
+                border-radius: 3px; 
+                font-size: 12px; 
+                color: white;
+                background-color: {% if app.status == 'approved' %}green{% elif app.status == 'rejected' %}red{% elif app.status == 'withdrawn' %}#6c757d{% else %}orange{% endif %};
+            ">
+                {{ app.get_status_display }}
+            </span>
+        </td>
+        <td>{{ app.reason|truncatechars:40 }}</td>
+        <td>
+            {% if app.certificate %}
+                <a href="{{ app.certificate.url }}" target="_blank">View</a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td>{{ app.created_at|date:"Y-m-d H:i" }}</td>
+        <td>
+            <a href="{% url 'leave:leave_application_detail' app.id %}">View Details</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="9">No leave applications found.</td></tr>
+    {% endfor %}
+</table>
+
+{% if applications|length > 5 %}
+    <p style="margin-top: 10px;">
+        <a href="{% url 'leave:leave_applications' %}">View all {{ applications|length }} applications →</a>
+    </p>
+{% endif %}
+
+{% else %}
+    <p>No leave applications found.</p>
+{% endif %}
+
+<!-- Download Balance Modal -->
+{% if user.is_staff %}
+<div class="modal fade" id="downloadBalanceModal" tabindex="-1" role="dialog" aria-labelledby="downloadBalanceModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="downloadBalanceModalLabel">
+                    <i class="fas fa-download mr-2"></i>Download Leave Balances
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="downloadBalanceForm" method="post" action="{% url 'leave:download_balances' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="as_of_date">
+                            <i class="fas fa-calendar mr-1"></i>Balance As Of Date
+                        </label>
+                        <input type="date" 
+                               class="form-control" 
+                               id="as_of_date" 
+                               name="as_of_date" 
+                               value="{{ current_year }}-{{ "now"|date:"m-d" }}"
+                               max="{{ current_year }}-12-31"
+                               required>
+                        <small class="form-text text-muted">
+                            Select the date for which you want to download leave balances.
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="region_filter">
+                            <i class="fas fa-map-marker-alt mr-1"></i>Region Filter
+                        </label>
+                        <select class="form-control" id="region_filter" name="region_filter">
+                            <option value="">All Regions</option>
+                            <option value="HK">Hong Kong</option>
+                            <option value="CN">China</option>
+                        </select>
+                        <small class="form-text text-muted">
+                            Filter employees by region (optional).
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="format">
+                            <i class="fas fa-file mr-1"></i>Download Format
+                        </label>
+                        <select class="form-control" id="format" name="format">
+                            <option value="csv">CSV (.csv)</option>
+                            <option value="excel">Excel (.xlsx)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Report will include:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Employee name and email</li>
+                            <li>Region and join date</li>
+                            <li>Annual leave balance as of selected date</li>
+                            <li>Sick leave balance as of selected date</li>
+                            <li>Leave taken up to selected date</li>
+                            <li>Remaining entitlement</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-download mr-1"></i>Download Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+// Handle download form submission
+document.getElementById('downloadBalanceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Generating...';
+    submitBtn.disabled = true;
+    
+    // Create a form and submit it to trigger download
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "leave:download_balances" %}';
+    
+    // Add form data
+    for (let [key, value] of formData.entries()) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+    }
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    
+    // Reset button after a delay
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        $('#downloadBalanceModal').modal('hide');
+    }, 2000);
+});
+</script>
+
+{% endblock %}

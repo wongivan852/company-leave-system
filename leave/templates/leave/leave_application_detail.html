@@ -1,0 +1,169 @@
+{% extends "leave/base.html" %}
+{% block content %}
+
+<h2>Leave Application Details</h2>
+
+<!-- Navigation -->
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'leave:leave_applications' %}">← Back to Applications</a> |
+    <a href="{% url 'leave:dashboard' %}">Dashboard</a>
+</div>
+
+<!-- Application Details -->
+<div style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+            <h3>Application Information</h3>
+            <table style="width: 100%;">
+                <tr>
+                    <td><strong>Application ID:</strong></td>
+                    <td>#{{ application.id }}</td>
+                </tr>
+                {% if is_manager_view %}
+                <tr>
+                    <td><strong>Employee:</strong></td>
+                    <td>
+                        {{ application.employee.user.get_full_name|default:application.employee.user.username }}<br>
+                        <small>{{ application.employee.user.email }}</small>
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td><strong>Leave Type:</strong></td>
+                    <td>{{ application.leave_type.name }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Status:</strong></td>
+                    <td>
+                        <span style="
+                            padding: 5px 10px; 
+                            border-radius: 3px; 
+                            color: white;
+                            background-color: {% if application.status == 'approved' %}green{% elif application.status == 'rejected' %}red{% elif application.status == 'withdrawn' %}#6c757d{% else %}orange{% endif %};
+                        ">
+                            {{ application.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Days Applied:</strong></td>
+                    <td>{{ application.days_applied }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Applied On:</strong></td>
+                    <td>{{ application.created_at|date:"F d, Y \a\t H:i" }}</td>
+                </tr>
+                {% if application.updated_at != application.created_at %}
+                <tr>
+                    <td><strong>Last Updated:</strong></td>
+                    <td>{{ application.updated_at|date:"F d, Y \a\t H:i" }}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+        
+        <div>
+            <h3>Leave Dates</h3>
+            <table style="width: 100%;">
+                <tr>
+                    <td><strong>Start Date:</strong></td>
+                    <td>{{ application.date_from|date:"F d, Y \a\t H:i" }}</td>
+                </tr>
+                <tr>
+                    <td><strong>End Date:</strong></td>
+                    <td>{{ application.date_to|date:"F d, Y \a\t H:i" }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Duration:</strong></td>
+                    <td>{{ application.days_applied }} day{% if application.days_applied != 1 %}s{% endif %}</td>
+                </tr>
+            </table>
+            
+            {% if application.approver %}
+            <h3 style="margin-top: 20px;">Approval Information</h3>
+            <table style="width: 100%;">
+                <tr>
+                    <td><strong>Approver:</strong></td>
+                    <td>{{ application.approver.get_full_name|default:application.approver.username }}</td>
+                </tr>
+                {% if application.manager_comment %}
+                <tr>
+                    <td><strong>Manager Comment:</strong></td>
+                    <td>{{ application.manager_comment }}</td>
+                </tr>
+                {% endif %}
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Reason -->
+{% if application.reason %}
+<div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <h3>Reason for Leave</h3>
+    <p style="white-space: pre-wrap;">{{ application.reason }}</p>
+</div>
+{% endif %}
+
+<!-- Certificate -->
+{% if application.certificate %}
+<div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <h3>Supporting Documents</h3>
+    <p>
+        <strong>Certificate/Document:</strong> 
+        <a href="{{ application.certificate.url }}" target="_blank" style="color: #007cba;">
+            View Document
+        </a>
+    </p>
+</div>
+{% endif %}
+
+<!-- Employee Actions (if user owns the application and it's pending) -->
+{% if not is_manager_view and application.status == 'pending' and application.employee.user == request.user %}
+<div style="background: #e8f4fd; border: 1px solid #b8daff; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <h3>Application Actions</h3>
+    <p>You can revise or withdraw this application while it's pending approval.</p>
+    
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <a href="{% url 'leave:revise_leave_application' application.id %}" 
+           style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; display: inline-block;">
+            <i class="fas fa-edit"></i> Revise Application
+        </a>
+        <a href="{% url 'leave:withdraw_leave_application' application.id %}" 
+           style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; display: inline-block;">
+            <i class="fas fa-times"></i> Withdraw Application
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Manager Actions (if user is staff and application is pending) -->
+{% if is_manager_view and application.status == 'pending' %}
+<div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <h3>Manager Actions</h3>
+    <form method="post" style="margin-top: 15px;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px;">
+            <label for="manager_comment"><strong>Manager Comments:</strong></label><br>
+            <textarea name="manager_comment" id="manager_comment" rows="3" style="width: 100%; margin-top: 5px;" placeholder="Add your comments here (optional)">{{ application.manager_comment }}</textarea>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" name="action" value="approve" 
+                    style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer;"
+                    onclick="return confirm('Are you sure you want to approve this leave application?')">
+                ✓ Approve
+            </button>
+            <button type="submit" name="action" value="reject" 
+                    style="background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer;"
+                    onclick="return confirm('Are you sure you want to reject this leave application?')">
+                ✗ Reject
+            </button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,322 @@
+{% extends "leave/base.html" %}
+
+{% block title %}Special Leave Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-check text-primary"></i> Special Leave Management
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> Manager Instructions:</h6>
+                        <ul class="mb-0">
+                            <li><strong>Work Claims:</strong> Approve when employees worked beyond normal hours (weekends, holidays, overtime)</li>
+                            <li><strong>Leave Applications:</strong> Approve/reject special leave requests using earned credits</li>
+                            <li>Approved work claims add credits to employee balance</li>
+                            <li>Approved leave applications deduct credits from employee balance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Work Claims -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock text-warning"></i> Pending Work Claims
+                        <span class="badge badge-warning ml-2">{{ pending_claims|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_claims %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Work Date</th>
+                                        <th>Session</th>
+                                        <th>Event/Project</th>
+                                        <th>Description</th>
+                                        <th>Credits</th>
+                                        <th>Submitted</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for claim in pending_claims %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ claim.employee.user.get_full_name }}</strong>
+                                                <br><small class="text-muted">{{ claim.employee.user.email }}</small>
+                                            </td>
+                                            <td>{{ claim.work_date|date:"M d, Y" }}</td>
+                                            <td>
+                                                <span class="badge badge-light">{{ claim.get_session_display }}</span>
+                                            </td>
+                                            <td><strong>{{ claim.event_name }}</strong></td>
+                                            <td>
+                                                <small>{{ claim.description|truncatechars:100|default:"-" }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-info">{{ claim.credits_earned|floatformat:1 }}</span>
+                                            </td>
+                                            <td>{{ claim.created_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-success" onclick="showApprovalModal('claim', {{ claim.id }}, '{{ claim.employee.user.get_full_name }}', 'work claim for {{ claim.event_name }}')">
+                                                    <i class="fas fa-check"></i> Approve
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="showRejectionModal('claim', {{ claim.id }}, '{{ claim.employee.user.get_full_name }}', 'work claim for {{ claim.event_name }}')">
+                                                    <i class="fas fa-times"></i> Reject
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h5 class="text-muted">No pending work claims</h5>
+                            <p class="text-muted">All work claims have been processed.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Leave Applications -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-check text-warning"></i> Pending Special Leave Applications
+                        <span class="badge badge-warning ml-2">{{ pending_applications|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_applications %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Leave Date</th>
+                                        <th>Session</th>
+                                        <th>Reason</th>
+                                        <th>Credits</th>
+                                        <th>Applied</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in pending_applications %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ application.employee.user.get_full_name }}</strong>
+                                                <br><small class="text-muted">{{ application.employee.user.email }}</small>
+                                            </td>
+                                            <td>{{ application.leave_date|date:"M d, Y" }}</td>
+                                            <td>
+                                                <span class="badge badge-light">{{ application.get_session_display }}</span>
+                                            </td>
+                                            <td>
+                                                <small>{{ application.reason|truncatechars:100 }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-info">{{ application.credits_used|floatformat:1 }}</span>
+                                            </td>
+                                            <td>{{ application.created_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-success" onclick="showApprovalModal('application', {{ application.id }}, '{{ application.employee.user.get_full_name }}', 'leave application for {{ application.leave_date|date:"M d" }}')">
+                                                    <i class="fas fa-check"></i> Approve
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="showRejectionModal('application', {{ application.id }}, '{{ application.employee.user.get_full_name }}', 'leave application for {{ application.leave_date|date:"M d" }}')">
+                                                    <i class="fas fa-times"></i> Reject
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h5 class="text-muted">No pending leave applications</h5>
+                            <p class="text-muted">All special leave applications have been processed.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-history text-secondary"></i> Recent Work Claims
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_claims %}
+                        {% for claim in recent_claims %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <small><strong>{{ claim.employee.user.get_full_name }}</strong></small>
+                                    <br><small class="text-muted">{{ claim.event_name }} - {{ claim.work_date|date:"M d" }}</small>
+                                </div>
+                                <div>
+                                    {% if claim.status == 'approved' %}
+                                        <span class="badge badge-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Rejected</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <small class="text-muted">No recent activity</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-history text-secondary"></i> Recent Leave Applications
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_applications %}
+                        {% for application in recent_applications %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <small><strong>{{ application.employee.user.get_full_name }}</strong></small>
+                                    <br><small class="text-muted">{{ application.leave_date|date:"M d" }} - {{ application.get_session_display }}</small>
+                                </div>
+                                <div>
+                                    {% if application.status == 'approved' %}
+                                        <span class="badge badge-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Rejected</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <small class="text-muted">No recent activity</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approval Modal -->
+<div class="modal fade" id="approvalModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle text-success"></i> Approve Request
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Are you sure you want to approve <strong><span id="approval-employee"></span></strong>'s <span id="approval-item"></span>?</p>
+                    <div class="form-group">
+                        <label for="approval-comment">Manager Comment (optional)</label>
+                        <textarea class="form-control" id="approval-comment" name="manager_comment" rows="3" placeholder="Add any comments..."></textarea>
+                    </div>
+                    <input type="hidden" name="action" value="approve">
+                    <input type="hidden" name="type" id="approval-type">
+                    <input type="hidden" name="id" id="approval-id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Rejection Modal -->
+<div class="modal fade" id="rejectionModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-times-circle text-danger"></i> Reject Request
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Are you sure you want to reject <strong><span id="rejection-employee"></span></strong>'s <span id="rejection-item"></span>?</p>
+                    <div class="form-group">
+                        <label for="rejection-comment">Reason for Rejection <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="rejection-comment" name="manager_comment" rows="3" placeholder="Please provide reason for rejection..." required></textarea>
+                    </div>
+                    <input type="hidden" name="action" value="reject">
+                    <input type="hidden" name="type" id="rejection-type">
+                    <input type="hidden" name="id" id="rejection-id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function showApprovalModal(type, id, employee, item) {
+    document.getElementById('approval-type').value = type;
+    document.getElementById('approval-id').value = id;
+    document.getElementById('approval-employee').textContent = employee;
+    document.getElementById('approval-item').textContent = item;
+    document.getElementById('approval-comment').value = '';
+    $('#approvalModal').modal('show');
+}
+
+function showRejectionModal(type, id, employee, item) {
+    document.getElementById('rejection-type').value = type;
+    document.getElementById('rejection-id').value = id;
+    document.getElementById('rejection-employee').textContent = employee;
+    document.getElementById('rejection-item').textContent = item;
+    document.getElementById('rejection-comment').value = '';
+    $('#rejectionModal').modal('show');
+}
+</script>
+{% endblock %}

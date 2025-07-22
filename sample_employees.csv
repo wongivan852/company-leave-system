@@ -1,0 +1,5 @@
+username,email,first_name,last_name,date_joined,region,is_staff,annual_leave_balance,sick_leave_balance
+alice.chan,alice.chan@company.com,Alice,Chan,2023-01-15,HK,false,14,7
+bob.li,bob.li@company.com,Bob,Li,2022-05-20,CN,false,18,7
+carol.wong,carol.wong@company.com,Carol,Wong,2021-03-10,HK,true,21,7
+david.zhao,david.zhao@company.com,David,Zhao,2020-08-01,CN,false,21,7

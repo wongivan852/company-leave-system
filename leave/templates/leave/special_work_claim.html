@@ -1,0 +1,394 @@
+{% extends "leave/base.html" %}
+
+{% block title %}Special Work Claim{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock text-primary"></i> Special Work Claim
+                    </h5>
+                    <div class="text-right">
+                        <small class="text-muted">Current Balance: </small>
+                        {% if balance_info.balance > 0 %}
+                            <span class="badge badge-success badge-lg">
+                                {{ balance_info.balance|floatformat:1 }} credits
+                            </span>
+                        {% else %}
+                            <span class="badge badge-secondary badge-lg">
+                                {{ balance_info.balance|floatformat:1 }} credits
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Balance Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="info-card">
+                                <div class="info-label">Credits Earned</div>
+                                <div class="info-value text-success">{{ balance_info.earned|floatformat:1 }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card">
+                                <div class="info-label">Credits Used</div>
+                                <div class="info-value text-warning">{{ balance_info.used|floatformat:1 }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card">
+                                <div class="info-label">Available Balance</div>
+                                <div class="info-value text-primary">{{ balance_info.balance|floatformat:1 }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> How Special Work Claims Work:</h6>
+                        <ul class="mb-0">
+                            <li><strong>Single Day:</strong> Leave end date blank for single day claims</li>
+                            <li><strong>Multiple Days:</strong> Set end date for consecutive work periods (e.g., 3-day Easter work, Christmas week)</li>
+                            <li><strong>AM Session (9:00 - 13:00):</strong> Earn 0.5 special leave credit per day</li>
+                            <li><strong>PM Session (13:00 - 18:00):</strong> Earn 0.5 special leave credit per day</li>
+                            <li><strong>Full Day (9:00 - 18:00):</strong> Earn 1.0 special leave credit per day</li>
+                            <li>Claims require manager approval before credits are added to your balance</li>
+                            <li>Submit claims for working beyond normal working hours (weekends, holidays, overtime)</li>
+                            <li><strong>Maximum:</strong> Up to 14 consecutive days per claim</li>
+                        </ul>
+                    </div>
+
+                    <!-- Claim Form -->
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        
+                        <!-- Form Errors Display -->
+                        {% if form.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                <h6><i class="fas fa-exclamation-triangle"></i> Please correct the following errors:</h6>
+                                {% for field, errors in form.errors.items %}
+                                    {% if field != '__all__' %}
+                                        <strong>{{ field|title }}:</strong>
+                                        {% for error in errors %}
+                                            {{ error }}<br>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for error in errors %}
+                                            {{ error }}<br>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="{{ form.work_date.id_for_label }}">Start Date</label>
+                                    {{ form.work_date }}
+                                    {% if form.work_date.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.work_date.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="{{ form.work_end_date.id_for_label }}">End Date</label>
+                                    {{ form.work_end_date }}
+                                    {% if form.work_end_date.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.work_end_date.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Leave blank for single day</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="{{ form.session.id_for_label }}">Session</label>
+                                    {{ form.session }}
+                                    {% if form.session.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.session.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Days & Credits</label>
+                                    <div class="form-control-plaintext">
+                                        <div class="badge badge-primary" id="days-badge">1</div>
+                                        <span class="text-muted">day(s)</span>
+                                        <br>
+                                        <div class="badge badge-success" id="credits-badge">1.0</div>
+                                        <span class="text-muted">credits</span>
+                                    </div>
+                                    <small class="form-text text-muted" id="credits-calculation">Single day</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="{{ form.event_name.id_for_label }}">Event/Project Name</label>
+                                    {{ form.event_name }}
+                                    {% if form.event_name.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.event_name.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.description.id_for_label }}">Description</label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.description.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.priority.id_for_label }}">Priority</label>
+                                    {{ form.priority }}
+                                    {% if form.priority.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.priority.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Set priority based on urgency of the work performed</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Submit Claim
+                        </button>
+                        <a href="{% url 'leave:special_leave_apply' %}" class="btn btn-success">
+                            <i class="fas fa-calendar-plus"></i> Apply Special Leave
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Claims History -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history text-secondary"></i> My Special Work Claims
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if claims %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Work Date(s)</th>
+                                        <th>Days</th>
+                                        <th>Session</th>
+                                        <th>Event/Project</th>
+                                        <th>Credits</th>
+                                        <th>Status</th>
+                                        <th>Submitted</th>
+                                        <th>Manager Comment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for claim in claims %}
+                                        <tr>
+                                            <td>
+                                                {{ claim.work_date|date:"M d, Y" }}
+                                                {% if claim.work_end_date and claim.work_end_date != claim.work_date %}
+                                                    <br><small class="text-muted">to {{ claim.work_end_date|date:"M d, Y" }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-primary">{{ claim.get_work_days_count }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-light">{{ claim.get_session_display }}</span>
+                                            </td>
+                                            <td>
+                                                <strong>{{ claim.event_name }}</strong>
+                                                {% if claim.description %}
+                                                    <br><small class="text-muted">{{ claim.description|truncatechars:100 }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-info">{{ claim.credits_earned|floatformat:1 }}</span>
+                                            </td>
+                                            <td>
+                                                {% if claim.status == 'pending' %}
+                                                    <span class="badge badge-warning">Pending</span>
+                                                {% elif claim.status == 'approved' %}
+                                                    <span class="badge badge-success">Approved</span>
+                                                {% elif claim.status == 'rejected' %}
+                                                    <span class="badge badge-danger">Rejected</span>
+                                                {% else %}
+                                                    <span class="badge badge-secondary">{{ claim.get_status_display }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ claim.created_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                {% if claim.manager_comment %}
+                                                    <small>{{ claim.manager_comment|truncatechars:50 }}</small>
+                                                {% else %}
+                                                    <small class="text-muted">-</small>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if claims.has_other_pages %}
+                            <nav aria-label="Claims pagination">
+                                <ul class="pagination justify-content-center">
+                                    {% if claims.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ claims.previous_page_number }}">Previous</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% for num in claims.paginator.page_range %}
+                                        {% if claims.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if claims.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ claims.next_page_number }}">Next</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No special work claims yet</h5>
+                            <p class="text-muted">Submit your first claim for working beyond normal hours.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.info-card {
+    text-align: center;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.info-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.badge-lg {
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+}
+</style>
+
+<script>
+// Update credits and days display based on session selection and date range
+document.addEventListener('DOMContentLoaded', function() {
+    const sessionSelect = document.getElementById('{{ form.session.id_for_label }}');
+    const daysBadge = document.getElementById('days-badge');
+    const creditsBadge = document.getElementById('credits-badge');
+    const creditsCalculation = document.getElementById('credits-calculation');
+    const startDateInput = document.getElementById('{{ form.work_date.id_for_label }}');
+    const endDateInput = document.getElementById('{{ form.work_end_date.id_for_label }}');
+    
+    function calculateDays() {
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        
+        if (!startDate) return 1;
+        if (!endDate) return 1;
+        
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        
+        return diffDays;
+    }
+    
+    function updateCreditsAndDays() {
+        const session = sessionSelect.value;
+        const days = calculateDays();
+        const creditsPerDay = (session === 'AM' || session === 'PM') ? 0.5 : 1.0;
+        const totalCredits = creditsPerDay * days;
+        
+        daysBadge.textContent = days;
+        creditsBadge.textContent = totalCredits.toFixed(1);
+        
+        if (days === 1) {
+            creditsCalculation.textContent = 'Single day';
+        } else {
+            creditsCalculation.textContent = `${creditsPerDay} credits × ${days} days`;
+        }
+    }
+    
+    sessionSelect.addEventListener('change', updateCreditsAndDays);
+    startDateInput.addEventListener('change', updateCreditsAndDays);
+    endDateInput.addEventListener('change', updateCreditsAndDays);
+    updateCreditsAndDays(); // Initialize on page load
+});
+</script>
+{% endblock %}

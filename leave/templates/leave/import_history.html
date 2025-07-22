@@ -1,0 +1,165 @@
+{% extends 'leave/base.html' %}
+
+{% block title %}Employee Import History{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Employee Import History</h2>
+                <a href="{% url 'leave:holiday_management' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Management
+                </a>
+            </div>
+
+            {% if imports %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Import Records</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Uploaded By</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Results</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for import_record in imports %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ import_record.file_name }}</strong>
+                                    </td>
+                                    <td>
+                                        {{ import_record.uploaded_by.get_full_name|default:import_record.uploaded_by.username }}
+                                    </td>
+                                    <td>
+                                        {{ import_record.upload_date|date:"M d, Y H:i" }}
+                                    </td>
+                                    <td>
+                                        {% if import_record.status == 'success' %}
+                                            <span class="badge badge-success">Success</span>
+                                        {% elif import_record.status == 'partial' %}
+                                            <span class="badge badge-warning">Partial</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">Failed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>
+                                            {% if import_record.total_rows %}
+                                                Total: {{ import_record.total_rows }}<br>
+                                            {% endif %}
+                                            {% if import_record.created_count %}
+                                                Created: {{ import_record.created_count }}<br>
+                                            {% endif %}
+                                            {% if import_record.updated_count %}
+                                                Updated: {{ import_record.updated_count }}<br>
+                                            {% endif %}
+                                            {% if import_record.error_count %}
+                                                Errors: {{ import_record.error_count }}
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{% url 'leave:view_import_content' import_record.id %}" 
+                                               class="btn btn-primary btn-sm" title="Download CSV">
+                                                <i class="fas fa-download"></i> CSV
+                                            </a>
+                                            {% if import_record.import_log %}
+                                            <button type="button" class="btn btn-info btn-sm" 
+                                                    data-toggle="modal" 
+                                                    data-target="#logModal{{ import_record.id }}"
+                                                    title="View Log">
+                                                <i class="fas fa-list"></i> Log
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                No import records found. Start by importing employee data from the <a href="{% url 'leave:holiday_management' %}">management page</a>.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Log Modals -->
+{% for import_record in imports %}
+{% if import_record.import_log %}
+<div class="modal fade" id="logModal{{ import_record.id }}" tabindex="-1" role="dialog" aria-labelledby="logModalLabel{{ import_record.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logModalLabel{{ import_record.id }}">
+                    Import Log - {{ import_record.file_name }}
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Import Summary</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong>Total Rows:</strong><br>
+                                {{ import_record.total_rows|default:"N/A" }}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Created:</strong><br>
+                                {{ import_record.created_count|default:0 }}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Updated:</strong><br>
+                                {{ import_record.updated_count|default:0 }}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Errors:</strong><br>
+                                {{ import_record.error_count|default:0 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Detailed Log</h6>
+                    </div>
+                    <div class="card-body">
+                        <pre class="bg-light p-3" style="max-height: 400px; overflow-y: auto; font-size: 12px;">{{ import_record.import_log }}</pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href="{% url 'leave:view_import_content' import_record.id %}" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Download CSV
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endblock %}
