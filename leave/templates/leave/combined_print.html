@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined Leave Applications - Print</title>
+    <style>
+        @media screen {
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background-color: #f5f5f5;
+            }
+            .print-container {
+                background: white;
+                padding: 20px;
+                max-width: 210mm; /* A4 width */
+                margin: 0 auto;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+            .print-actions {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .btn {
+                background-color: #007bff;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                margin: 0 10px;
+                text-decoration: none;
+                display: inline-block;
+            }
+            .btn:hover {
+                background-color: #0056b3;
+            }
+            .btn-secondary {
+                background-color: #6c757d;
+            }
+            .btn-secondary:hover {
+                background-color: #545b62;
+            }
+        }
+        
+        @media print {
+            body {
+                margin: 0;
+                background-color: white;
+            }
+            .print-container {
+                box-shadow: none;
+                padding: 0;
+                max-width: none;
+            }
+            .print-actions {
+                display: none;
+            }
+            @page {
+                size: A4 landscape;
+                margin: 8mm;
+            }
+        }
+        
+        /* Combined print layout - Landscape A4 with side-by-side forms */
+        .combined-container {
+            width: 297mm; /* A4 landscape width */
+            height: 210mm; /* A4 landscape height */
+            display: flex;
+            flex-direction: row;
+            gap: 5mm;
+        }
+        
+        .form-half {
+            width: 146mm; /* Half of landscape A4 width minus gap */
+            height: 210mm; /* Full landscape A4 height */
+            border: 1px dashed #ccc;
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+        
+        .form-half:first-child {
+            border-right: 2px solid #000;
+            margin-right: 0;
+        }
+        
+        .form-half:last-child {
+            border-left: none;
+        }
+        
+        /* Form styling - optimized for landscape A4 half-width */
+        .leave-form-a5 {
+            font-family: Arial, sans-serif;
+            font-size: 11px; /* Increased for better readability in landscape */
+            line-height: 1.2;
+            padding: 8mm; /* Balanced padding for landscape half-width */
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .company-header-a5 {
+            text-align: center;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+        
+        .company-name-a5 {
+            font-size: 16px; /* Increased for landscape half-width */
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        
+        .form-title-a5 {
+            font-size: 14px; /* Increased for landscape half-width */
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .form-row-a5 {
+            display: flex;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+        
+        .form-label-a5 {
+            font-weight: bold;
+            margin-right: 12px;
+            min-width: 80px;
+            font-size: 10px;
+        }
+        
+        .form-value-a5 {
+            border-bottom: 1px solid #000;
+            padding: 2px 4px;
+            min-height: 14px;
+            flex: 1;
+            font-size: 10px;
+        }
+        
+        .leave-type-table-a5 {
+            border: 1px solid #000;
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 8px;
+            font-size: 9px;
+            flex-shrink: 0;
+        }
+        
+        .leave-type-table-a5 th,
+        .leave-type-table-a5 td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: left;
+        }
+        
+        .leave-type-table-a5 th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            font-size: 9px;
+        }
+        
+        .leave-type-row-a5 {
+            height: 35px;
+            vertical-align: top;
+        }
+        
+        .checkbox-cell-a5 {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .date-cell-a5 {
+            width: 80px;
+            vertical-align: top;
+            font-size: 8px;
+            line-height: 1.2;
+        }
+        
+        .date-cell-a5 small {
+            font-size: 6px;
+            color: #666;
+        }
+        
+        .special-work-section-a5 {
+            border: 1px solid #ccc;
+            padding: 4px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+            background-color: #fafafa;
+            opacity: 0.7;
+        }
+        
+        .special-work-title-a5 {
+            font-weight: bold;
+            margin-bottom: 2px;
+            font-size: 8px;
+            color: #666;
+        }
+        
+        .special-work-optional-a5 {
+            font-size: 6px;
+            color: #999;
+            font-style: italic;
+            margin-bottom: 3px;
+        }
+        
+        .special-work-table-a5 {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 7px;
+        }
+        
+        .special-work-table-a5 td {
+            border: 1px solid #ccc;
+            padding: 2px;
+            height: 12px;
+            color: #777;
+        }
+        
+        .signature-section-a5 {
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+        
+        .signature-row-a5 {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        
+        .signature-box-a5 {
+            width: 110px;
+        }
+        
+        .signature-label-a5 {
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 9px;
+        }
+        
+        .signature-line-a5 {
+            border-bottom: 1px solid #000;
+            height: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .date-line-a5 {
+            border-bottom: 1px solid #000;
+            height: 12px;
+            width: 80px;
+        }
+        
+        .empty-form {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-style: italic;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="print-container">
+        {% if not is_pdf %}
+        <div class="print-actions">
+            <button class="btn" onclick="window.print()">🖨️ Print Combined Forms</button>
+            <a href="{% url 'leave:combined_print_pdf' %}?ids={{ application_ids_param }}" class="btn btn-secondary">💾 Save as PDF</a>
+            <a href="{% url 'leave:leave_applications' %}" class="btn btn-secondary">← Back to Applications</a>
+        </div>
+        {% endif %}
+        
+        <div class="combined-container">
+            <!-- First Application (Top Half) -->
+            <div class="form-half">
+                {% if applications.0 %}
+                    {% include 'leave/leave_form_a5_partial.html' with application=applications.0 date_back_to_work=dates_back_to_work.0 %}
+                {% else %}
+                    <div class="empty-form">
+                        <div>No application selected for top half</div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Second Application (Bottom Half) -->
+            <div class="form-half">
+                {% if applications.1 %}
+                    {% include 'leave/leave_form_a5_partial.html' with application=applications.1 date_back_to_work=dates_back_to_work.1 %}
+                {% else %}
+                    <div class="empty-form">
+                        <div>No application selected for bottom half</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-focus print dialog when accessed with print parameter
+        if (window.location.search.includes('print=true')) {
+            window.onload = function() {
+                window.print();
+            };
+        }
+    </script>
+</body>
+</html>

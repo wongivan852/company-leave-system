@@ -236,6 +236,7 @@
                                 <strong>Optional Fields:</strong>
                                 <ul class="small mb-2">
                                     <li><code>region</code> - HK or CN (default: HK)</li>
+                                    <li><code>company</code> - Krystal Institute Ltd, Krystal Technology Ltd, or Other</li>
                                     <li><code>is_staff</code> - true/false (default: false)</li>
                                     <li><code>annual_leave_balance</code> - Days available</li>
                                     <li><code>sick_leave_balance</code> - Days available</li>
@@ -286,10 +287,10 @@ function confirmDelete(holidayId, holidayName) {
 }
 
 function downloadSampleCSV() {
-    const csvContent = `username,email,first_name,last_name,date_joined,region,is_staff,annual_leave_balance,sick_leave_balance
-john.doe,john.doe@company.com,John,Doe,2023-01-15,HK,false,14,7
-jane.smith,jane.smith@company.com,Jane,Smith,2022-05-20,CN,true,18,7
-mike.wang,mike.wang@company.com,Mike,Wang,2021-03-10,HK,false,21,7`;
+    const csvContent = `username,email,first_name,last_name,date_joined,region,company,is_staff,annual_leave_balance,sick_leave_balance
+john.doe,john.doe@company.com,John,Doe,2023-01-15,HK,Krystal Institute Ltd,false,14,7
+jane.smith,jane.smith@company.com,Jane,Smith,2022-05-20,CN,Krystal Technology Ltd,true,18,7
+mike.wang,mike.wang@company.com,Mike,Wang,2021-03-10,HK,Krystal Institute Ltd,false,21,7`;
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');

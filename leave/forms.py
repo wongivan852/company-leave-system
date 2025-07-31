@@ -37,6 +37,17 @@ class LeaveApplicationForm(forms.ModelForm):
             'style': 'width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px;'
         })
     )
+    
+    date_back_to_work = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px;',
+            'readonly': 'readonly'
+        }),
+        help_text='This will be calculated automatically based on your leave end date'
+    )
 
     class Meta:
         model = LeaveApplication

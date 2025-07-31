@@ -1,0 +1,210 @@
+<div class="leave-form-a5">
+    <!-- Company Header -->
+    <div class="company-header-a5">
+        <div class="company-name-a5">{{ application.employee.company|default:"Krystal Institute Ltd" }}</div>
+        <div class="form-title-a5">Employee Leave Application</div>
+    </div>
+    
+    <!-- Employee Name -->
+    <div class="form-row-a5">
+        <span class="form-label-a5">Name</span>
+        <div class="form-value-a5">{{ application.employee.user.get_full_name }}</div>
+    </div>
+    
+    <!-- Leave Type Table -->
+    <table class="leave-type-table-a5">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th>From</th>
+                <th>To</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="leave-type-row-a5">
+                <td class="checkbox-cell-a5">
+                    {% if application.leave_type.name == "Annual Leave" %}✓{% endif %}
+                </td>
+                <td style="font-size: 9px;">Annual Leave</td>
+                <td class="date-cell-a5">
+                    {% if application.leave_type.name == "Annual Leave" %}
+                        {{ application.date_from|date:"d/m/Y" }} ({{ application.date_from|date:"D" }})<br>
+                        <small>
+                            {% if application.date_from|date:"H" < "13" %}
+                                9:00am - 1:00pm
+                            {% else %}
+                                2:00pm - 6:00pm
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                </td>
+                <td class="date-cell-a5">
+                    {% if application.leave_type.name == "Annual Leave" %}
+                        {{ application.date_to|date:"d/m/Y" }} ({{ application.date_to|date:"D" }})<br>
+                        <small>
+                            {% if application.date_to|date:"H" < "13" %}
+                                9:00am - 1:00pm
+                            {% else %}
+                                2:00pm - 6:00pm
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr class="leave-type-row-a5">
+                <td class="checkbox-cell-a5">
+                    {% if application.leave_type.name == "Sick Leave" %}✓{% endif %}
+                </td>
+                <td style="font-size: 9px;">Sick Leave</td>
+                <td class="date-cell-a5">
+                    {% if application.leave_type.name == "Sick Leave" %}
+                        {{ application.date_from|date:"d/m/Y" }} ({{ application.date_from|date:"D" }})<br>
+                        <small>
+                            {% if application.date_from|date:"H" < "13" %}
+                                9:00am - 1:00pm
+                            {% else %}
+                                2:00pm - 6:00pm
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                </td>
+                <td class="date-cell-a5">
+                    {% if application.leave_type.name == "Sick Leave" %}
+                        {{ application.date_to|date:"d/m/Y" }} ({{ application.date_to|date:"D" }})<br>
+                        <small>
+                            {% if application.date_to|date:"H" < "13" %}
+                                9:00am - 1:00pm
+                            {% else %}
+                                2:00pm - 6:00pm
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr class="leave-type-row-a5">
+                <td class="checkbox-cell-a5">
+                    {% if application.leave_type.name == "No Paid Leave" %}✓{% endif %}
+                </td>
+                <td style="font-size: 9px;">No Paid Leave</td>
+                <td class="date-cell-a5">
+                    {% if application.leave_type.name == "No Paid Leave" %}
+                        {{ application.date_from|date:"d/m/Y" }} ({{ application.date_from|date:"D" }})<br>
+                        <small>
+                            {% if application.date_from|date:"H" < "13" %}
+                                9:00am - 1:00pm
+                            {% else %}
+                                2:00pm - 6:00pm
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                </td>
+                <td class="date-cell-a5">
+                    {% if application.leave_type.name == "No Paid Leave" %}
+                        {{ application.date_to|date:"d/m/Y" }} ({{ application.date_to|date:"D" }})<br>
+                        <small>
+                            {% if application.date_to|date:"H" < "13" %}
+                                9:00am - 1:00pm
+                            {% else %}
+                                2:00pm - 6:00pm
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- Reason for Leave -->
+    <div class="form-row-a5">
+        <span class="form-label-a5">Reason</span>
+        <div class="form-value-a5">{{ application.reason|default:""|truncatechars:50 }}</div>
+    </div>
+    
+    <!-- Date Back To Work -->
+    <div class="form-row-a5">
+        <span class="form-label-a5">Back to Work</span>
+        <div class="form-value-a5">
+            {{ date_back_to_work|date:"d/m/Y"|default:"" }}
+        </div>
+    </div>
+    
+    <!-- Total Leave Period -->
+    <div class="form-row-a5">
+        <span class="form-label-a5">Total Period</span>
+        <div class="form-value-a5">
+            {{ application.days_applied }} day{{ application.days_applied|pluralize }}
+        </div>
+    </div>
+    
+    <!-- Special Work Time Section -->
+    <div class="special-work-section-a5">
+        <div class="special-work-title-a5">Special Work Time</div>
+        <div class="special-work-optional-a5">(Optional - Complete only if requesting special work arrangements)</div>
+        <table class="special-work-table-a5">
+            <tr>
+                <td style="width: 40px; font-weight: bold; font-size: 8px;">Date</td>
+                <td style="width: 100px;"></td>
+                <td style="width: 40px; font-weight: bold; font-size: 8px;">Time</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; font-size: 8px;">For</td>
+                <td colspan="3"></td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; font-size: 8px;">Approved</td>
+                <td colspan="3"></td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- Special Time Off Section -->
+    <div class="special-work-section-a5">
+        <div class="special-work-title-a5">Special Time Off(Day Off) Apply</div>
+        <div class="special-work-optional-a5">(Optional - Complete only if requesting special day off arrangements)</div>
+        <table class="special-work-table-a5">
+            <tr>
+                <td style="width: 40px; font-weight: bold; font-size: 8px;">Date</td>
+                <td style="width: 100px;"></td>
+                <td style="width: 40px; font-weight: bold; font-size: 8px;">Time</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; font-size: 8px;">Approved</td>
+                <td colspan="3"></td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- Signature Section -->
+    <div class="signature-section-a5">
+        <div class="signature-row-a5">
+            <div class="signature-box-a5">
+                <div class="signature-label-a5">Applied By</div>
+                <div class="signature-line-a5">{{ application.employee.user.get_full_name|truncatechars:15 }}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: bold; font-size: 7px;">Date</span>
+                    <div class="date-line-a5">{{ application.created_at|date:"d/m/Y" }}</div>
+                </div>
+            </div>
+            
+            <div class="signature-box-a5">
+                <div class="signature-label-a5">Approved By</div>
+                <div class="signature-line-a5">
+                    {% if application.approved_by %}
+                        {{ application.approved_by.get_full_name|truncatechars:15 }}
+                    {% endif %}
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: bold; font-size: 7px;">Date</span>
+                    <div class="date-line-a5">
+                        {% if application.approved_at %}
+                            {{ application.approved_at|date:"d/m/Y" }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

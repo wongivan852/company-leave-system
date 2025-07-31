@@ -40,6 +40,7 @@ class Command(BaseCommand):
                         last_name = row.get('last_name', '').strip()
                         date_joined = row.get('date_joined', '').strip()
                         region = row.get('region', 'HK').strip()
+                        company = row.get('company', 'Krystal Institute Ltd').strip()
                         
                         # Optional fields
                         is_staff = row.get('is_staff', 'False').strip().lower() in ('true', '1', 'yes')
@@ -100,17 +101,22 @@ class Command(BaseCommand):
                             continue
                         
                         # Create or update employee profile
+                        valid_companies = ['Krystal Institute Ltd', 'Krystal Technology Ltd', 'Other']
+                        company_value = company if company in valid_companies else 'Krystal Institute Ltd'
+                        
                         profile, profile_created = EmployeeProfile.objects.get_or_create(
                             user=user,
                             defaults={
                                 'date_joined': join_date,
-                                'region': region if region in ['HK', 'CN'] else 'HK'
+                                'region': region if region in ['HK', 'CN'] else 'HK',
+                                'company': company_value
                             }
                         )
                         
                         if not profile_created and update:
                             profile.date_joined = join_date
                             profile.region = region if region in ['HK', 'CN'] else 'HK'
+                            profile.company = company_value
                             profile.save()
                         
                         # Create leave balances if provided

@@ -10,9 +10,16 @@ class EmployeeProfile(models.Model):
         ('CN', 'China Mainland'),
     )
     
+    COMPANY_CHOICES = (
+        ('Krystal Institute Ltd', 'Krystal Institute Ltd'),
+        ('Krystal Technology Ltd', 'Krystal Technology Ltd'),
+        ('Other', 'Other'),
+    )
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     date_joined = models.DateField()
     region = models.CharField(max_length=2, choices=REGION_CHOICES, default='HK')
+    company = models.CharField(max_length=100, choices=COMPANY_CHOICES, default='Krystal Institute Ltd')
 
     def years_of_service(self):
         return round((date.today() - self.date_joined).days / 365, 2)

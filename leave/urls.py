@@ -31,4 +31,8 @@ urlpatterns = [
     path("special-leave-management/", views.special_leave_management, name="special_leave_management"),
     path("holidays/<int:holiday_id>/edit/", views.holiday_edit, name="holiday_edit"),
     path("holidays/<int:holiday_id>/delete/", views.holiday_delete, name="holiday_delete"),
+    path("leave-applications/<int:application_id>/print/", views.leave_form_print, name="leave_form_print"),
+    path("leave-applications/<int:application_id>/pdf/", views.leave_form_pdf, name="leave_form_pdf"),
+    path("leave-applications/combined/print/", views.combined_print, name="combined_print"),
+    path("leave-applications/combined/pdf/", views.combined_print_pdf, name="combined_print_pdf"),
 ]

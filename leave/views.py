@@ -14,6 +14,16 @@ from .models import (EmployeeProfile, LeaveApplication, LeaveBalance, SpecialWor
                     SpecialLeaveApplication, SpecialLeaveNotification, SpecialLeaveApprovalWorkflow)
 
 
+def is_manager(user):
+    """Check if user is the authorized manager (manager@company.com)"""
+    return user.is_authenticated and user.email == 'manager@company.com'
+
+
+def can_approve_applications(user):
+    """Check if user can approve leave applications"""
+    return is_manager(user)
+
+
 def create_special_leave_notification(notification_type, recipient, sender=None, work_claim=None, leave_application=None, message=""):
     """Helper function to create special leave notifications"""
     try:
@@ -328,8 +338,8 @@ def leave_applications(request):
     leave_type_filter = request.GET.get('leave_type', '')
     search = request.GET.get('search', '')
     
-    # Base queryset - show all applications if user is staff, otherwise just their own
-    if request.user.is_staff:
+    # Base queryset - show all applications if user is manager, otherwise just their own
+    if is_manager(request.user):
         applications = LeaveApplication.objects.all()
         is_manager_view = True
     else:
@@ -384,14 +394,14 @@ def leave_application_detail(request, application_id):
     except EmployeeProfile.DoesNotExist:
         return render(request, "leave/no_profile.html")
     
-    # Get the application - staff can see all, employees can only see their own
-    if request.user.is_staff:
+    # Get the application - manager can see all, employees can only see their own
+    if is_manager(request.user):
         application = get_object_or_404(LeaveApplication, id=application_id)
     else:
         application = get_object_or_404(LeaveApplication, id=application_id, employee=employee)
     
-    # Handle manager approval/rejection
-    if request.method == 'POST' and request.user.is_staff:
+    # Handle manager approval/rejection - only manager@company.com can approve
+    if request.method == 'POST' and can_approve_applications(request.user):
         action = request.POST.get('action')
         manager_comment = request.POST.get('manager_comment', '')
         
@@ -422,7 +432,7 @@ def leave_application_detail(request, application_id):
     
     context = {
         'application': application,
-        'is_manager_view': request.user.is_staff,
+        'is_manager_view': is_manager(request.user),
     }
     
     return render(request, "leave/leave_application_detail.html", context)
@@ -705,6 +715,7 @@ def employee_import(request):
                     last_name = row.get('last_name', '').strip()
                     date_joined = row.get('date_joined', '').strip()
                     region = row.get('region', 'HK').strip()
+                    company = row.get('company', 'Krystal Institute Ltd').strip()
                     
                     # Optional fields
                     is_staff = row.get('is_staff', 'False').strip().lower() in ('true', '1', 'yes')
@@ -754,17 +765,22 @@ def employee_import(request):
                         import_log.append(f"Row {row_num}: Created user {username}")
                     
                     # Create or update employee profile
+                    valid_companies = ['Krystal Institute Ltd', 'Krystal Technology Ltd', 'Other']
+                    company_value = company if company in valid_companies else 'Krystal Institute Ltd'
+                    
                     profile, profile_created = EmployeeProfile.objects.get_or_create(
                         user=user,
                         defaults={
                             'date_joined': join_date,
-                            'region': region if region in ['HK', 'CN'] else 'HK'
+                            'region': region if region in ['HK', 'CN'] else 'HK',
+                            'company': company_value
                         }
                     )
                     
                     if not profile_created:
                         profile.date_joined = join_date
                         profile.region = region if region in ['HK', 'CN'] else 'HK'
+                        profile.company = company_value
                         profile.save()
                     
                     # Create leave balances if provided
@@ -1267,8 +1283,8 @@ def special_leave_apply(request):
 @login_required
 def special_leave_management(request):
     """Enhanced view for managers to approve/reject special work claims and leave applications"""
-    if not request.user.is_staff:
-        messages.error(request, "You don't have permission to access this page.")
+    if not can_approve_applications(request.user):
+        messages.error(request, "You don't have permission to access this page. Only the authorized manager can approve applications.")
         return redirect('leave:dashboard')
 
     # Handle approval/rejection actions (both individual and batch)
@@ -1461,3 +1477,272 @@ def special_leave_management(request):
     }
     
     return render(request, 'leave/special_leave_management.html', context)
+
+
+@login_required
+def leave_form_print(request, application_id):
+    """View for printing leave application form in PDF format"""
+    try:
+        employee = EmployeeProfile.objects.get(user=request.user)
+    except EmployeeProfile.DoesNotExist:
+        return render(request, "leave/no_profile.html")
+    
+    # Get the application - manager can see all, employees can only see their own
+    if is_manager(request.user):
+        application = get_object_or_404(LeaveApplication, id=application_id)
+    else:
+        application = get_object_or_404(LeaveApplication, id=application_id, employee=employee)
+    
+    # Calculate date back to work (next business day after leave ends)
+    date_back_to_work = None
+    if application.date_to:
+        from datetime import timedelta
+        # Get the date part of the datetime
+        end_date = application.date_to.date() if hasattr(application.date_to, 'date') else application.date_to
+        # Add one day
+        next_day = end_date + timedelta(days=1)
+        # Skip weekends
+        while next_day.weekday() >= 5:  # 5 = Saturday, 6 = Sunday
+            next_day += timedelta(days=1)
+        date_back_to_work = next_day
+    
+    context = {
+        'application': application,
+        'date_back_to_work': date_back_to_work,
+    }
+    
+    return render(request, 'leave/leave_form_print.html', context)
+
+
+@login_required
+def leave_form_pdf(request, application_id):
+    """Generate PDF version of leave application form"""
+    try:
+        from weasyprint import HTML, CSS
+        from django.template.loader import render_to_string
+        from django.http import HttpResponse
+        import tempfile
+        import os
+    except ImportError:
+        # Fallback if WeasyPrint is not installed
+        messages.error(request, "PDF generation is not available. WeasyPrint package is required.")
+        return redirect('leave:leave_form_print', application_id=application_id)
+    
+    try:
+        employee = EmployeeProfile.objects.get(user=request.user)
+    except EmployeeProfile.DoesNotExist:
+        return render(request, "leave/no_profile.html")
+    
+    # Get the application - manager can see all, employees can only see their own
+    if is_manager(request.user):
+        application = get_object_or_404(LeaveApplication, id=application_id)
+    else:
+        application = get_object_or_404(LeaveApplication, id=application_id, employee=employee)
+    
+    # Calculate date back to work (same as print view)
+    date_back_to_work = None
+    if application.date_to:
+        from datetime import timedelta
+        # Get the date part of the datetime
+        end_date = application.date_to.date() if hasattr(application.date_to, 'date') else application.date_to
+        # Add one day
+        next_day = end_date + timedelta(days=1)
+        # Skip weekends
+        while next_day.weekday() >= 5:  # 5 = Saturday, 6 = Sunday
+            next_day += timedelta(days=1)
+        date_back_to_work = next_day
+    
+    # Render HTML template
+    context = {
+        'application': application,
+        'date_back_to_work': date_back_to_work,
+        'is_pdf': True,  # Flag to hide print buttons in PDF
+    }
+    
+    html_string = render_to_string('leave/leave_form_print.html', context, request)
+    
+    # Additional CSS for PDF
+    pdf_css = CSS(string='''
+        @page {
+            size: A4;
+            margin: 1in;
+        }
+        .print-actions {
+            display: none !important;
+        }
+        body {
+            font-size: 12px;
+        }
+        .leave-form {
+            font-size: 12px;
+        }
+    ''')
+    
+    # Generate PDF
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf(stylesheets=[pdf_css])
+    
+    # Return PDF response
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    filename = f"Leave_Application_{application.employee.user.last_name}_{application.id}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
+@login_required
+def combined_print(request):
+    """View for printing multiple leave applications on one A4 page (2 applications in A5 format)"""
+    try:
+        employee = EmployeeProfile.objects.get(user=request.user)
+    except EmployeeProfile.DoesNotExist:
+        return render(request, "leave/no_profile.html")
+    
+    # Get application IDs from query parameters
+    app_ids = request.GET.get('ids', '').split(',')
+    app_ids = [id.strip() for id in app_ids if id.strip().isdigit()]
+    
+    if not app_ids:
+        messages.error(request, "No valid application IDs provided.")
+        return redirect('leave:leave_applications')
+    
+    # Limit to maximum 2 applications
+    app_ids = app_ids[:2]
+    
+    applications = []
+    dates_back_to_work = []
+    
+    for app_id in app_ids:
+        try:
+            # Get the application - manager can see all, employees can only see their own
+            if is_manager(request.user):
+                application = get_object_or_404(LeaveApplication, id=app_id)
+            else:
+                application = get_object_or_404(LeaveApplication, id=app_id, employee=employee)
+            
+            applications.append(application)
+            
+            # Calculate date back to work for this application
+            date_back_to_work = None
+            if application.date_to:
+                from datetime import timedelta
+                end_date = application.date_to.date() if hasattr(application.date_to, 'date') else application.date_to
+                next_day = end_date + timedelta(days=1)
+                while next_day.weekday() >= 5:  # Skip weekends
+                    next_day += timedelta(days=1)
+                date_back_to_work = next_day
+            
+            dates_back_to_work.append(date_back_to_work)
+            
+        except:
+            # If application not found or no permission, skip it
+            continue
+    
+    # Ensure we have exactly 2 slots (pad with None if needed)
+    while len(applications) < 2:
+        applications.append(None)
+        dates_back_to_work.append(None)
+    
+    context = {
+        'applications': applications,
+        'dates_back_to_work': dates_back_to_work,
+        'application_ids_param': ','.join(app_ids),
+    }
+    
+    return render(request, 'leave/combined_print.html', context)
+
+
+@login_required
+def combined_print_pdf(request):
+    """Generate PDF version of combined leave application forms"""
+    try:
+        from weasyprint import HTML, CSS
+        from django.template.loader import render_to_string
+        from django.http import HttpResponse
+    except ImportError:
+        messages.error(request, "PDF generation is not available. WeasyPrint package is required.")
+        return redirect('leave:combined_print')
+    
+    try:
+        employee = EmployeeProfile.objects.get(user=request.user)
+    except EmployeeProfile.DoesNotExist:
+        return render(request, "leave/no_profile.html")
+    
+    # Get application IDs from query parameters
+    app_ids = request.GET.get('ids', '').split(',')
+    app_ids = [id.strip() for id in app_ids if id.strip().isdigit()]
+    
+    if not app_ids:
+        messages.error(request, "No valid application IDs provided.")
+        return redirect('leave:leave_applications')
+    
+    # Limit to maximum 2 applications
+    app_ids = app_ids[:2]
+    
+    applications = []
+    dates_back_to_work = []
+    
+    for app_id in app_ids:
+        try:
+            # Get the application - manager can see all, employees can only see their own
+            if is_manager(request.user):
+                application = get_object_or_404(LeaveApplication, id=app_id)
+            else:
+                application = get_object_or_404(LeaveApplication, id=app_id, employee=employee)
+            
+            applications.append(application)
+            
+            # Calculate date back to work for this application
+            date_back_to_work = None
+            if application.date_to:
+                from datetime import timedelta
+                end_date = application.date_to.date() if hasattr(application.date_to, 'date') else application.date_to
+                next_day = end_date + timedelta(days=1)
+                while next_day.weekday() >= 5:  # Skip weekends
+                    next_day += timedelta(days=1)
+                date_back_to_work = next_day
+            
+            dates_back_to_work.append(date_back_to_work)
+            
+        except:
+            continue
+    
+    # Ensure we have exactly 2 slots
+    while len(applications) < 2:
+        applications.append(None)
+        dates_back_to_work.append(None)
+    
+    # Render HTML template
+    context = {
+        'applications': applications,
+        'dates_back_to_work': dates_back_to_work,
+        'application_ids_param': ','.join(app_ids),
+        'is_pdf': True,
+    }
+    
+    html_string = render_to_string('leave/combined_print.html', context, request)
+    
+    # Additional CSS for PDF
+    pdf_css = CSS(string='''
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+        .print-actions {
+            display: none !important;
+        }
+        body {
+            font-size: 10px;
+        }
+    ''')
+    
+    # Generate PDF
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf(stylesheets=[pdf_css])
+    
+    # Return PDF response
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    filename = f"Combined_Leave_Applications_{'-'.join(app_ids)}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response

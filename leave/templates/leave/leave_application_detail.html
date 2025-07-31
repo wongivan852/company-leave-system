@@ -4,9 +4,25 @@
 <h2>Leave Application Details</h2>
 
 <!-- Navigation -->
-<div style="margin-bottom: 20px;">
-    <a href="{% url 'leave:leave_applications' %}">← Back to Applications</a> |
-    <a href="{% url 'leave:dashboard' %}">Dashboard</a>
+<div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <a href="{% url 'leave:leave_applications' %}">← Back to Applications</a> |
+        <a href="{% url 'leave:dashboard' %}">Dashboard</a>
+    </div>
+    
+    <!-- Print and PDF Actions -->
+    <div style="display: flex; gap: 10px;">
+        <a href="{% url 'leave:leave_form_print' application.id %}" 
+           style="background: #17a2b8; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; display: inline-block;"
+           target="_blank" title="View Printable Form">
+            <i class="fas fa-print"></i> Print Form
+        </a>
+        <a href="{% url 'leave:leave_form_pdf' application.id %}" 
+           style="background: #dc3545; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; display: inline-block;"
+           title="Download as PDF">
+            <i class="fas fa-file-pdf"></i> Save PDF
+        </a>
+    </div>
 </div>
 
 <!-- Application Details -->

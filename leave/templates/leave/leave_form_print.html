@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Leave Application - {{ application.employee.user.get_full_name }}</title>
+    <style>
+        @media screen {
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background-color: #f5f5f5;
+            }
+            .print-container {
+                background: white;
+                padding: 40px;
+                max-width: 800px;
+                margin: 0 auto;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+            .print-actions {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .btn {
+                background-color: #007bff;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                margin: 0 10px;
+                text-decoration: none;
+                display: inline-block;
+            }
+            .btn:hover {
+                background-color: #0056b3;
+            }
+            .btn-secondary {
+                background-color: #6c757d;
+            }
+            .btn-secondary:hover {
+                background-color: #545b62;
+            }
+        }
+        
+        @media print {
+            body {
+                margin: 0;
+                background-color: white;
+            }
+            .print-container {
+                box-shadow: none;
+                padding: 0;
+                max-width: none;
+            }
+            .print-actions {
+                display: none;
+            }
+        }
+        
+        /* Form styling to match PDF */
+        .leave-form {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .company-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .form-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .form-row {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .form-label {
+            font-weight: bold;
+            margin-right: 20px;
+            min-width: 120px;
+        }
+        
+        .form-value {
+            border-bottom: 1px solid #000;
+            padding: 3px 5px;
+            min-height: 20px;
+            flex: 1;
+        }
+        
+        .leave-type-table {
+            border: 2px solid #000;
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+        
+        .leave-type-table th,
+        .leave-type-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .leave-type-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .leave-type-row {
+            height: 50px;
+            vertical-align: top;
+        }
+        
+        .checkbox-cell {
+            width: 30px;
+            text-align: center;
+        }
+        
+        .date-cell {
+            width: 150px;
+            vertical-align: top;
+            line-height: 1.3;
+        }
+        
+        .date-cell small {
+            font-size: 11px;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        .special-work-section {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 25px;
+            background-color: #fafafa;
+            opacity: 0.7;
+        }
+        
+        .special-work-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .special-work-optional {
+            font-size: 10px;
+            color: #999;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        
+        .special-work-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        .special-work-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            height: 25px;
+            color: #777;
+            font-size: 12px;
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+        }
+        
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .signature-box {
+            width: 300px;
+        }
+        
+        .signature-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #000;
+            height: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .date-line {
+            border-bottom: 1px solid #000;
+            height: 25px;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="print-container">
+        {% if not is_pdf %}
+        <div class="print-actions">
+            <button class="btn" onclick="window.print()">🖨️ Print Form</button>
+            <a href="{% url 'leave:leave_form_pdf' application.id %}" class="btn btn-secondary">💾 Save as PDF</a>
+            <a href="{% url 'leave:leave_application_detail' application.id %}" class="btn btn-secondary">← Back to Application</a>
+        </div>
+        {% endif %}
+        
+        <div class="leave-form">
+            <!-- Company Header -->
+            <div class="company-header">
+                <div class="company-name">{{ application.employee.company|default:"Krystal Institute Ltd" }}</div>
+                <div class="form-title">Employee Leave Application</div>
+            </div>
+            
+            <!-- Employee Name -->
+            <div class="form-row">
+                <span class="form-label">Name</span>
+                <div class="form-value">{{ application.employee.user.get_full_name }}</div>
+            </div>
+            
+            <!-- Leave Type Table -->
+            <table class="leave-type-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>From</th>
+                        <th>To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="leave-type-row">
+                        <td class="checkbox-cell">
+                            {% if application.leave_type.name == "Annual Leave" %}✓{% endif %}
+                        </td>
+                        <td>Annual Leave</td>
+                        <td class="date-cell">
+                            {% if application.leave_type.name == "Annual Leave" %}
+                                {{ application.date_from|date:"d/m/Y" }} ({{ application.date_from|date:"D" }})<br>
+                                <small>
+                                    {% if application.date_from|date:"H" < "13" %}
+                                        9:00am - 1:00pm
+                                    {% else %}
+                                        2:00pm - 6:00pm
+                                    {% endif %}
+                                </small>
+                            {% endif %}
+                        </td>
+                        <td class="date-cell">
+                            {% if application.leave_type.name == "Annual Leave" %}
+                                {{ application.date_to|date:"d/m/Y" }} ({{ application.date_to|date:"D" }})<br>
+                                <small>
+                                    {% if application.date_to|date:"H" < "13" %}
+                                        9:00am - 1:00pm
+                                    {% else %}
+                                        2:00pm - 6:00pm
+                                    {% endif %}
+                                </small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr class="leave-type-row">
+                        <td class="checkbox-cell">
+                            {% if application.leave_type.name == "Sick Leave" %}✓{% endif %}
+                        </td>
+                        <td>Sick Leave</td>
+                        <td class="date-cell">
+                            {% if application.leave_type.name == "Sick Leave" %}
+                                {{ application.date_from|date:"d/m/Y" }} ({{ application.date_from|date:"D" }})<br>
+                                <small>
+                                    {% if application.date_from|date:"H" < "13" %}
+                                        9:00am - 1:00pm
+                                    {% else %}
+                                        2:00pm - 6:00pm
+                                    {% endif %}
+                                </small>
+                            {% endif %}
+                        </td>
+                        <td class="date-cell">
+                            {% if application.leave_type.name == "Sick Leave" %}
+                                {{ application.date_to|date:"d/m/Y" }} ({{ application.date_to|date:"D" }})<br>
+                                <small>
+                                    {% if application.date_to|date:"H" < "13" %}
+                                        9:00am - 1:00pm
+                                    {% else %}
+                                        2:00pm - 6:00pm
+                                    {% endif %}
+                                </small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr class="leave-type-row">
+                        <td class="checkbox-cell">
+                            {% if application.leave_type.name == "No Paid Leave" %}✓{% endif %}
+                        </td>
+                        <td>No Paid Leave</td>
+                        <td class="date-cell">
+                            {% if application.leave_type.name == "No Paid Leave" %}
+                                {{ application.date_from|date:"d/m/Y" }} ({{ application.date_from|date:"D" }})<br>
+                                <small>
+                                    {% if application.date_from|date:"H" < "13" %}
+                                        9:00am - 1:00pm
+                                    {% else %}
+                                        2:00pm - 6:00pm
+                                    {% endif %}
+                                </small>
+                            {% endif %}
+                        </td>
+                        <td class="date-cell">
+                            {% if application.leave_type.name == "No Paid Leave" %}
+                                {{ application.date_to|date:"d/m/Y" }} ({{ application.date_to|date:"D" }})<br>
+                                <small>
+                                    {% if application.date_to|date:"H" < "13" %}
+                                        9:00am - 1:00pm
+                                    {% else %}
+                                        2:00pm - 6:00pm
+                                    {% endif %}
+                                </small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Reason for Leave -->
+            <div class="form-row">
+                <span class="form-label">Reason for Leave</span>
+                <div class="form-value">{{ application.reason|default:"" }}</div>
+            </div>
+            
+            <!-- Date Back To Work -->
+            <div class="form-row">
+                <span class="form-label">Date Back To Work</span>
+                <div class="form-value">
+                    {{ date_back_to_work|date:"d/m/Y"|default:"" }}
+                </div>
+            </div>
+            
+            <!-- Total Leave Period -->
+            <div class="form-row">
+                <span class="form-label">Total Leave Period</span>
+                <div class="form-value">
+                    {{ application.days_applied }} day{{ application.days_applied|pluralize }}
+                </div>
+            </div>
+            
+            <!-- Special Work Time Section -->
+            <div class="special-work-section">
+                <div class="special-work-title">Special Work Time</div>
+                <div class="special-work-optional">(Optional - Complete only if requesting special work arrangements)</div>
+                <table class="special-work-table">
+                    <tr>
+                        <td style="width: 60px; font-weight: bold;">Date</td>
+                        <td style="width: 200px;"></td>
+                        <td style="width: 60px; font-weight: bold;">Time</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">For</td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Approved</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Special Time Off Section -->
+            <div class="special-work-section">
+                <div class="special-work-title">Special Time Off(Day Off) Apply</div>
+                <div class="special-work-optional">(Optional - Complete only if requesting special day off arrangements)</div>
+                <table class="special-work-table">
+                    <tr>
+                        <td style="width: 60px; font-weight: bold;">Date</td>
+                        <td style="width: 200px;"></td>
+                        <td style="width: 60px; font-weight: bold;">Time</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Approved</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Signature Section -->
+            <div class="signature-section">
+                <div class="signature-row">
+                    <div class="signature-box">
+                        <div class="signature-label">Applied By</div>
+                        <div class="signature-line">{{ application.employee.user.get_full_name }}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: bold;">Date</span>
+                            <div class="date-line">{{ application.created_at|date:"d/m/Y" }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="signature-box">
+                        <div class="signature-label">Approved By</div>
+                        <div class="signature-line">
+                            {% if application.approved_by %}
+                                {{ application.approved_by.get_full_name }}
+                            {% endif %}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: bold;">Date</span>
+                            <div class="date-line">
+                                {% if application.approved_at %}
+                                    {{ application.approved_at|date:"d/m/Y" }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-focus print dialog when accessed with print parameter
+        if (window.location.search.includes('print=true')) {
+            window.onload = function() {
+                window.print();
+            };
+        }
+    </script>
+</body>
+</html>

@@ -129,6 +129,33 @@
                             </div>
                         </div>
                         
+                        <!-- Date Back to Work Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.date_back_to_work.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-calendar-check mr-1"></i>Date Back to Work:
+                                    </label>
+                                    {{ form.date_back_to_work }}
+                                    <small class="form-text text-muted">{{ form.date_back_to_work.help_text }}</small>
+                                    {% if form.date_back_to_work.errors %}
+                                        <div class="text-danger small mt-1">{{ form.date_back_to_work.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">
+                                        <i class="fas fa-calendar-day mr-1"></i>Total Leave Period:
+                                    </label>
+                                    <div class="form-control-plaintext" id="total-leave-period" style="font-weight: bold; color: #007bff;">
+                                        Will be calculated automatically
+                                    </div>
+                                    <small class="form-text text-muted">Total days of leave applied for</small>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="{{ form.reason.id_for_label }}" class="font-weight-bold">
                                 <i class="fas fa-comment mr-1"></i>Reason for Leave:
@@ -245,11 +272,81 @@
 
 <!-- JavaScript for real-time Saturday working day checking and weekend validation -->
 <script>
+function updateCalculatedFields() {
+    const startDate = document.getElementById('id_start_date').value;
+    const endDate = document.getElementById('id_end_date').value;
+    const startTime = document.getElementById('id_start_time').value;
+    const endTime = document.getElementById('id_end_time').value;
+    const dateBackToWorkField = document.getElementById('id_date_back_to_work');
+    const totalLeavePeriodDiv = document.getElementById('total-leave-period');
+    
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        // Calculate date back to work (next working day after leave end)
+        const backToWork = new Date(end);
+        backToWork.setDate(backToWork.getDate() + 1);
+        
+        // Skip weekends for back to work date
+        while (backToWork.getDay() === 0 || backToWork.getDay() === 6) {
+            backToWork.setDate(backToWork.getDate() + 1);
+        }
+        
+        // Format date for input field (YYYY-MM-DD)
+        const backToWorkFormatted = backToWork.toISOString().split('T')[0];
+        if (dateBackToWorkField) {
+            dateBackToWorkField.value = backToWorkFormatted;
+        }
+        
+        // Calculate total leave period in days
+        let totalDays = 0;
+        const currentDate = new Date(start);
+        
+        while (currentDate <= end) {
+            // Count all days including weekends (business rules will be handled by backend)
+            totalDays += 1;
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        
+        // Adjust for partial days based on start/end times
+        let partialDayAdjustment = 0;
+        if (startTime === 'PM') partialDayAdjustment -= 0.5;
+        if (endTime === 'AM') partialDayAdjustment -= 0.5;
+        
+        const finalDays = Math.max(0, totalDays + partialDayAdjustment);
+        
+        // Update total leave period display
+        if (totalLeavePeriodDiv) {
+            if (finalDays === 1) {
+                totalLeavePeriodDiv.textContent = `${finalDays} day`;
+            } else if (finalDays % 1 === 0) {
+                totalLeavePeriodDiv.textContent = `${finalDays} days`;
+            } else {
+                totalLeavePeriodDiv.textContent = `${finalDays} days`;
+            }
+        }
+    } else {
+        // Clear fields if dates are not complete
+        if (dateBackToWorkField) {
+            dateBackToWorkField.value = '';
+        }
+        if (totalLeavePeriodDiv) {
+            totalLeavePeriodDiv.textContent = 'Will be calculated automatically';
+        }
+    }
+}
+
 function validateDateSelection() {
     const startDate = document.getElementById('id_start_date').value;
     const endDate = document.getElementById('id_end_date').value;
+    const startTime = document.getElementById('id_start_time').value;
+    const endTime = document.getElementById('id_end_time').value;
     const noticeDiv = document.getElementById('saturday-notice');
     const noticeText = document.getElementById('saturday-notice-text');
+    
+    // Calculate and update date back to work and total leave period
+    updateCalculatedFields();
     
     // Clear any existing weekend error messages
     const existingWeekendError = document.getElementById('weekend-error');
@@ -315,10 +412,16 @@ function validateDateSelection() {
 document.addEventListener('DOMContentLoaded', function() {
     const startDateField = document.getElementById('id_start_date');
     const endDateField = document.getElementById('id_end_date');
+    const startTimeField = document.getElementById('id_start_time');
+    const endTimeField = document.getElementById('id_end_time');
     
     if (startDateField && endDateField) {
         startDateField.addEventListener('change', validateDateSelection);
         endDateField.addEventListener('change', validateDateSelection);
+        
+        // Also listen to time field changes for calculations
+        if (startTimeField) startTimeField.addEventListener('change', validateDateSelection);
+        if (endTimeField) endTimeField.addEventListener('change', validateDateSelection);
         
         // Check on page load if dates are already filled
         validateDateSelection();

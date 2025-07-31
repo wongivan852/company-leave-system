@@ -61,12 +61,42 @@
     <strong>{{ page_obj.paginator.count }}</strong> application{% if page_obj.paginator.count != 1 %}s{% endif %} found
 </p>
 
+<!-- Combined Print Section -->
+{% if applications %}
+<div style="background: #e8f4fd; padding: 15px; margin-bottom: 20px; border-radius: 5px; border-left: 4px solid #007bff;">
+    <h4 style="margin: 0 0 10px 0; color: #007bff;">
+        <i class="fas fa-print mr-2"></i>Combined Printing (A5 on A4)
+    </h4>
+    <p style="margin: 0 0 15px 0; font-size: 14px; color: #666;">
+        Select up to 2 applications to print together on one A4 page (each in A5 size) to save paper resources.
+    </p>
+    
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <button type="button" id="combinedPrintBtn" class="btn btn-primary btn-sm" onclick="printCombined()" disabled>
+            <i class="fas fa-print mr-1"></i>Print Combined (2 Forms/Page)
+        </button>
+        <button type="button" id="combinedPdfBtn" class="btn btn-secondary btn-sm" onclick="downloadCombinedPdf()" disabled>
+            <i class="fas fa-file-pdf mr-1"></i>Download Combined PDF
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearSelection()">
+            <i class="fas fa-times mr-1"></i>Clear Selection
+        </button>
+        <span id="selectionCount" style="font-size: 12px; color: #666; margin-left: 10px;">
+            Select applications using checkboxes
+        </span>
+    </div>
+</div>
+{% endif %}
+
 <!-- Applications Table -->
 {% if applications %}
 <div style="overflow-x: auto;">
     <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
         <thead style="background-color: #f0f0f0;">
             <tr>
+                <th style="width: 40px;">
+                    <input type="checkbox" id="selectAll" onchange="toggleAllCheckboxes()" title="Select/Deselect All">
+                </th>
                 {% if is_manager_view %}
                 <th>Employee</th>
                 {% endif %}
@@ -82,6 +112,9 @@
         <tbody>
             {% for app in applications %}
             <tr>
+                <td style="text-align: center;">
+                    <input type="checkbox" class="app-checkbox" value="{{ app.id }}" onchange="updateSelection()" title="Select for combined printing">
+                </td>
                 {% if is_manager_view %}
                 <td>
                     {{ app.employee.user.get_full_name|default:app.employee.user.username }}<br>
@@ -136,5 +169,106 @@
     <p>No leave applications found.</p>
     <a href="{% url 'leave:apply_leave' %}" style="background: #007cba; color: white; padding: 10px 15px; text-decoration: none; border-radius: 3px;">Apply for Leave</a>
 {% endif %}
+
+<script>
+// Combined printing functionality
+let selectedApplications = [];
+
+function toggleAllCheckboxes() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.app-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAll.checked;
+    });
+    
+    updateSelection();
+}
+
+function updateSelection() {
+    const checkboxes = document.querySelectorAll('.app-checkbox:checked');
+    selectedApplications = Array.from(checkboxes).map(cb => cb.value);
+    
+    const count = selectedApplications.length;
+    const selectionCount = document.getElementById('selectionCount');
+    const printBtn = document.getElementById('combinedPrintBtn');
+    const pdfBtn = document.getElementById('combinedPdfBtn');
+    const selectAll = document.getElementById('selectAll');
+    
+    // Update selection count display
+    if (count === 0) {
+        selectionCount.textContent = 'Select applications using checkboxes';
+        selectionCount.style.color = '#666';
+    } else if (count === 1) {
+        selectionCount.textContent = `${count} application selected (select 1 more for optimal printing)`;
+        selectionCount.style.color = '#ffc107';
+    } else if (count === 2) {
+        selectionCount.textContent = `${count} applications selected (perfect for A4 page)`;
+        selectionCount.style.color = '#28a745';
+    } else {
+        selectionCount.textContent = `${count} applications selected (only first 2 will be used)`;
+        selectionCount.style.color = '#dc3545';
+    }
+    
+    // Enable/disable buttons
+    printBtn.disabled = count === 0;
+    pdfBtn.disabled = count === 0;
+    
+    // Update select all checkbox state
+    const totalCheckboxes = document.querySelectorAll('.app-checkbox').length;
+    const checkedCheckboxes = document.querySelectorAll('.app-checkbox:checked').length;
+    
+    if (checkedCheckboxes === 0) {
+        selectAll.indeterminate = false;
+        selectAll.checked = false;
+    } else if (checkedCheckboxes === totalCheckboxes) {
+        selectAll.indeterminate = false;
+        selectAll.checked = true;
+    } else {
+        selectAll.indeterminate = true;
+        selectAll.checked = false;
+    }
+}
+
+function printCombined() {
+    if (selectedApplications.length === 0) {
+        alert('Please select at least one application to print.');
+        return;
+    }
+    
+    const ids = selectedApplications.slice(0, 2).join(',');
+    const url = `{% url 'leave:combined_print' %}?ids=${ids}&print=true`;
+    window.open(url, '_blank');
+}
+
+function downloadCombinedPdf() {
+    if (selectedApplications.length === 0) {
+        alert('Please select at least one application to download.');
+        return;
+    }
+    
+    const ids = selectedApplications.slice(0, 2).join(',');
+    const url = `{% url 'leave:combined_print_pdf' %}?ids=${ids}`;
+    window.location.href = url;
+}
+
+function clearSelection() {
+    const checkboxes = document.querySelectorAll('.app-checkbox');
+    const selectAll = document.getElementById('selectAll');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    selectAll.checked = false;
+    selectAll.indeterminate = false;
+    
+    updateSelection();
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateSelection();
+});
+</script>
 
 {% endblock %}
