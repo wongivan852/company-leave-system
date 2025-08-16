@@ -1,398 +1,292 @@
 {% extends "leave/base.html" %}
-
-{% block title %}Special Leave Application{% endblock %}
-
 {% block content %}
 <div class="container-fluid">
     <div class="row">
-        <div class="col-12">
+        <div class="col-lg-8">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-calendar-plus text-success"></i> Apply Special Leave
-                    </h5>
-                    <div class="text-right">
-                        <small class="text-muted">Available Balance: </small>
-                        {% if balance_info.balance > 0 %}
-                            <span class="badge badge-success badge-lg">
-                                {{ balance_info.balance|floatformat:1 }} credits
-                            </span>
-                        {% else %}
-                            <span class="badge badge-secondary badge-lg">
-                                {{ balance_info.balance|floatformat:1 }} credits
-                            </span>
-                        {% endif %}
-                    </div>
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-calendar-plus mr-2"></i>
+                        {% if is_revision %}Revise Special Leave Application{% else %}Apply for Special Leave{% endif %}
+                    </h4>
                 </div>
                 <div class="card-body">
-                    <!-- Balance Summary -->
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="info-card">
-                                <div class="info-label">Credits Earned</div>
-                                <div class="info-value text-success">{{ balance_info.earned|floatformat:1 }}</div>
+                    <!-- Navigation -->
+                    <div class="mb-3">
+                        <a href="{% url 'leave:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <a href="{% url 'leave:special_work_claim' %}" class="btn btn-outline-primary btn-sm ml-2">
+                            <i class="fas fa-plus"></i> Submit Work Claim
+                        </a>
+                        <a href="{% url 'leave:special_leave_management' %}" class="btn btn-outline-info btn-sm ml-2">
+                            <i class="fas fa-list"></i> My Special Leave
+                        </a>
+                    </div>
+
+                    <!-- Balance Info -->
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <strong>Credits Earned</strong><br>
+                                <span class="badge badge-success badge-lg">{{ balance_info.earned|floatformat:1 }}</span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-card">
-                                <div class="info-label">Credits Used</div>
-                                <div class="info-value text-warning">{{ balance_info.used|floatformat:1 }}</div>
+                            <div class="col-md-4 text-center">
+                                <strong>Credits Used</strong><br>
+                                <span class="badge badge-warning badge-lg">{{ balance_info.used|floatformat:1 }}</span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-card">
-                                <div class="info-label">Available Balance</div>
-                                <div class="info-value text-primary">{{ balance_info.balance|floatformat:1 }}</div>
+                            <div class="col-md-4 text-center">
+                                <strong>Available Balance</strong><br>
+                                <span class="badge badge-primary badge-lg">{{ balance_info.balance|floatformat:1 }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Instructions -->
-                    <div class="alert alert-success">
-                        <h6><i class="fas fa-info-circle"></i> How Special Leave Works:</h6>
-                        <ul class="mb-0">
-                            <li><strong>Single Day:</strong> Leave end date blank for single day applications</li>
-                            <li><strong>Multiple Days:</strong> Set end date for consecutive leave periods (e.g., 3-day Easter break, Christmas week)</li>
-                            <li><strong>AM Session (9:00 - 13:00):</strong> Uses 0.5 special leave credit per day</li>
-                            <li><strong>PM Session (13:00 - 18:00):</strong> Uses 0.5 special leave credit per day</li>
-                            <li><strong>Full Day (9:00 - 18:00):</strong> Uses 1.0 special leave credit per day</li>
-                            <li>Applications require manager approval before leave is granted</li>
-                            <li>You can only apply for leave if you have sufficient credit balance for the entire period</li>
-                            <li><strong>Maximum:</strong> Up to 14 consecutive days per application</li>
-                        </ul>
-                    </div>
-
-                    <!-- Application Form -->
-                    {% if balance_info.balance > 0 %}
-                        <form method="post" class="mb-4">
-                            {% csrf_token %}
-                            
-                            <!-- Form Errors Display -->
-                            {% if form.errors %}
-                                <div class="alert alert-danger" role="alert">
-                                    <h6><i class="fas fa-exclamation-triangle"></i> Please correct the following errors:</h6>
-                                    {% for field, errors in form.errors.items %}
-                                        {% if field != '__all__' %}
-                                            <strong>{{ field|title }}:</strong>
-                                            {% for error in errors %}
-                                                {{ error }}<br>
-                                            {% endfor %}
-                                        {% else %}
-                                            {% for error in errors %}
-                                                {{ error }}<br>
-                                            {% endfor %}
-                                        {% endif %}
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <strong>Please correct the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
                                     {% endfor %}
-                                </div>
-                            {% endif %}
-                            
-                            <div class="row">
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="{{ form.leave_date.id_for_label }}">Start Date</label>
-                                        {{ form.leave_date }}
-                                        {% if form.leave_date.errors %}
-                                            <div class="text-danger">
-                                                {% for error in form.leave_date.errors %}
-                                                    <small>{{ error }}</small>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="{{ form.leave_end_date.id_for_label }}">End Date</label>
-                                        {{ form.leave_end_date }}
-                                        {% if form.leave_end_date.errors %}
-                                            <div class="text-danger">
-                                                {% for error in form.leave_end_date.errors %}
-                                                    <small>{{ error }}</small>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                        <small class="form-text text-muted">Leave blank for single day</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="{{ form.session.id_for_label }}">Session</label>
-                                        {{ form.session }}
-                                        {% if form.session.errors %}
-                                            <div class="text-danger">
-                                                {% for error in form.session.errors %}
-                                                    <small>{{ error }}</small>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label>Days & Credits</label>
-                                        <div class="form-control-plaintext">
-                                            <div class="badge badge-primary" id="days-badge">1</div>
-                                            <span class="text-muted">day(s)</span>
-                                            <br>
-                                            <div class="badge badge-warning" id="credits-badge">1.0</div>
-                                            <span class="text-muted">required</span>
-                                        </div>
-                                        <small class="form-text text-muted" id="credits-calculation">Single day</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Available Balance</label>
-                                        <div class="form-control-plaintext">
-                                            <span class="badge badge-success">{{ balance_info.balance|floatformat:1 }}</span>
-                                            <span class="text-muted">credits</span>
-                                        </div>
-                                        <small class="form-text text-muted">Your current balance</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="form-group">
-                                        <label for="{{ form.reason.id_for_label }}">Reason for Special Leave</label>
-                                        {{ form.reason }}
-                                        {% if form.reason.errors %}
-                                            <div class="text-danger">
-                                                {% for error in form.reason.errors %}
-                                                    <small>{{ error }}</small>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="{{ form.urgency.id_for_label }}">Urgency Level</label>
-                                        {{ form.urgency }}
-                                        {% if form.urgency.errors %}
-                                            <div class="text-danger">
-                                                {% for error in form.urgency.errors %}
-                                                    <small>{{ error }}</small>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                        <small class="form-text text-muted">Set urgency based on how soon you need approval</small>
-                                    </div>
-                                </div>
-                            </div>
-                            {% if form.non_field_errors %}
-                                <div class="alert alert-danger">
-                                    {% for error in form.non_field_errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-paper-plane"></i> Submit Application
-                            </button>
-                            <a href="{% url 'leave:special_work_claim' %}" class="btn btn-primary">
-                                <i class="fas fa-clock"></i> Claim Work Credits
-                            </a>
-                        </form>
-                    {% else %}
-                        <div class="alert alert-warning">
-                            <h6><i class="fas fa-exclamation-triangle"></i> Insufficient Balance</h6>
-                            <p class="mb-2">You don't have any special leave credits available. You need to earn credits by submitting work claims first.</p>
-                            <a href="{% url 'leave:special_work_claim' %}" class="btn btn-primary">
-                                <i class="fas fa-clock"></i> Submit Work Claim
-                            </a>
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.start_date.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-calendar mr-1"></i>Start Date: <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.start_date }}
+                                    {% if form.start_date.errors %}
+                                        <div class="text-danger small mt-1">{{ form.start_date.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.start_session.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-clock mr-1"></i>Start Session: <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.start_session }}
+                                    <small class="form-text text-muted">AM: 9:00am-1:00pm, PM: 2:00pm-6:00pm</small>
+                                    {% if form.start_session.errors %}
+                                        <div class="text-danger small mt-1">{{ form.start_session.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.end_date.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-calendar mr-1"></i>End Date: <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.end_date }}
+                                    {% if form.end_date.errors %}
+                                        <div class="text-danger small mt-1">{{ form.end_date.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.end_session.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-clock mr-1"></i>End Session: <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.end_session }}
+                                    <small class="form-text text-muted">AM: 9:00am-1:00pm, PM: 2:00pm-6:00pm</small>
+                                    {% if form.end_session.errors %}
+                                        <div class="text-danger small mt-1">{{ form.end_session.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Back to Office Info -->
+                        <div class="alert alert-info" id="back-to-office-info" style="display: none;">
+                            <h6><i class="fas fa-calendar-check mr-2"></i>Back to Office Information</h6>
+                            <p class="mb-0" id="back-to-office-text"></p>
+                        </div>
+                        
+                        <!-- Credits Usage Info -->
+                        <div class="alert alert-warning" id="credits-info" style="display: none;">
+                            <h6><i class="fas fa-coins mr-2"></i>Credits Usage</h6>
+                            <p class="mb-0" id="credits-text"></p>
+                        </div>
+                        
+                        <!-- Reason Row -->
+                        <div class="form-group">
+                            <label for="{{ form.reason.id_for_label }}" class="font-weight-bold">
+                                <i class="fas fa-comment mr-1"></i>Reason for Special Leave:
+                            </label>
+                            {{ form.reason }}
+                            {% if form.reason.errors %}
+                                <div class="text-danger small mt-1">{{ form.reason.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg mr-3">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                {% if is_revision %}Update Application{% else %}Submit Application{% endif %}
+                            </button>
+                            <a href="{% url 'leave:dashboard' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Applications History -->
-    <div class="row mt-4">
-        <div class="col-12">
+        
+        <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-history text-secondary"></i> My Special Leave Applications
-                    </h5>
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle mr-2"></i>Special Leave Information
+                    </h6>
                 </div>
                 <div class="card-body">
-                    {% if applications %}
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>Leave Date(s)</th>
-                                        <th>Days</th>
-                                        <th>Session</th>
-                                        <th>Reason</th>
-                                        <th>Credits</th>
-                                        <th>Status</th>
-                                        <th>Applied</th>
-                                        <th>Manager Comment</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for application in applications %}
-                                        <tr>
-                                            <td>
-                                                {{ application.leave_date|date:"M d, Y" }}
-                                                {% if application.leave_end_date and application.leave_end_date != application.leave_date %}
-                                                    <br><small class="text-muted">to {{ application.leave_end_date|date:"M d, Y" }}</small>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-primary">{{ application.get_leave_days_count }}</span>
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-light">{{ application.get_session_display }}</span>
-                                            </td>
-                                            <td>
-                                                <small>{{ application.reason|truncatechars:80 }}</small>
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-info">{{ application.credits_used|floatformat:1 }}</span>
-                                            </td>
-                                            <td>
-                                                {% if application.status == 'pending' %}
-                                                    <span class="badge badge-warning">Pending</span>
-                                                {% elif application.status == 'approved' %}
-                                                    <span class="badge badge-success">Approved</span>
-                                                {% elif application.status == 'rejected' %}
-                                                    <span class="badge badge-danger">Rejected</span>
-                                                {% else %}
-                                                    <span class="badge badge-secondary">{{ application.get_status_display }}</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>{{ application.created_at|date:"M d, Y" }}</td>
-                                            <td>
-                                                {% if application.manager_comment %}
-                                                    <small>{{ application.manager_comment|truncatechars:50 }}</small>
-                                                {% else %}
-                                                    <small class="text-muted">-</small>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Pagination -->
-                        {% if applications.has_other_pages %}
-                            <nav aria-label="Applications pagination">
-                                <ul class="pagination justify-content-center">
-                                    {% if applications.has_previous %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ applications.previous_page_number }}">Previous</a>
-                                        </li>
-                                    {% endif %}
-                                    
-                                    {% for num in applications.paginator.page_range %}
-                                        {% if applications.number == num %}
-                                            <li class="page-item active">
-                                                <span class="page-link">{{ num }}</span>
-                                            </li>
-                                        {% else %}
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                            </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                    
-                                    {% if applications.has_next %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ applications.next_page_number }}">Next</a>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </nav>
-                        {% endif %}
-                    {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No special leave applications yet</h5>
-                            <p class="text-muted">Submit your first special leave application when you have earned credits.</p>
-                        </div>
-                    {% endif %}
+                    <ul class="small mb-0 pl-3">
+                        <li>Special leave uses credits earned from working beyond normal hours</li>
+                        <li>Credits are earned through approved special work claims</li>
+                        <li>Same session logic as regular leave: AM (9-1pm), PM (2-6pm)</li>
+                        <li>All special leave applications require manager approval</li>
+                        <li>You can only apply for special leave if you have sufficient credits</li>
+                    </ul>
                 </div>
             </div>
+            
+            {% if applications %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-history mr-2"></i>Recent Special Leave Applications
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% for app in applications %}
+                        <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+                            <div>
+                                <small class="font-weight-bold">{{ app.date_from|date:"M d" }} - {{ app.date_to|date:"M d" }}</small><br>
+                                <small class="text-muted">{{ app.credits_used }} credits</small>
+                            </div>
+                            <span class="badge badge-{% if app.status == 'approved' %}success{% elif app.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                {{ app.get_status_display }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
-<style>
-.info-card {
-    text-align: center;
-    padding: 15px;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-}
-
-.info-label {
-    font-size: 0.9rem;
-    color: #6c757d;
-    margin-bottom: 5px;
-}
-
-.info-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.badge-lg {
-    font-size: 1rem;
-    padding: 0.5rem 0.75rem;
-}
-</style>
-
+<!-- JavaScript for real-time calculation -->
 <script>
-// Update credits and days display based on session selection and date range
-document.addEventListener('DOMContentLoaded', function() {
-    const sessionSelect = document.getElementById('{{ form.session.id_for_label }}');
-    const daysBadge = document.getElementById('days-badge');
-    const creditsBadge = document.getElementById('credits-badge');
-    const creditsCalculation = document.getElementById('credits-calculation');
-    const startDateInput = document.getElementById('{{ form.leave_date.id_for_label }}');
-    const endDateInput = document.getElementById('{{ form.leave_end_date.id_for_label }}');
+function updateBackToOfficeInfo() {
+    const startDate = document.getElementById('id_start_date').value;
+    const startSession = document.getElementById('id_start_session').value;
+    const endDate = document.getElementById('id_end_date').value;
+    const endSession = document.getElementById('id_end_session').value;
+    const infoDiv = document.getElementById('back-to-office-info');
+    const infoText = document.getElementById('back-to-office-text');
+    const creditsDiv = document.getElementById('credits-info');
+    const creditsText = document.getElementById('credits-text');
     
-    function calculateDays() {
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
+    if (startDate && startSession && endDate && endSession) {
+        let backToOfficeDate;
+        let backToOfficeText;
         
-        if (!startDate) return 1;
-        if (!endDate) return 1;
-        
+        // Calculate credits required
         const start = new Date(startDate);
         const end = new Date(endDate);
-        const diffTime = Math.abs(end - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        let credits = 0;
         
-        return diffDays;
-    }
-    
-    function updateCreditsAndDays() {
-        const session = sessionSelect.value;
-        const days = calculateDays();
-        const creditsPerDay = (session === 'AM' || session === 'PM') ? 0.5 : 1.0;
-        const totalCredits = creditsPerDay * days;
-        
-        daysBadge.textContent = days;
-        creditsBadge.textContent = totalCredits.toFixed(1);
-        
-        if (days === 1) {
-            creditsCalculation.textContent = 'Single day';
+        if (startDate === endDate) {
+            // Same day
+            if (startSession === 'AM' && endSession === 'PM') {
+                credits = 1.0; // Full day
+            } else {
+                credits = 0.5; // Half day
+            }
         } else {
-            creditsCalculation.textContent = `${creditsPerDay} credits × ${days} days`;
+            // Multiple days - simplified calculation
+            const days = (end - start) / (1000 * 60 * 60 * 24) + 1;
+            credits = days; // Approximate - actual calculation is more complex
         }
+        
+        // Show credits usage
+        creditsText.innerHTML = `This application will use <strong>${credits} credit(s)</strong> from your special leave balance.`;
+        creditsDiv.style.display = 'block';
+        
+        // If leave starts with AM session, return same day
+        if (startSession === 'AM') {
+            backToOfficeDate = new Date(startDate);
+            backToOfficeText = `You will return to office on <strong>${formatDate(backToOfficeDate)}</strong> (same day) at 2:00 PM since your leave starts with AM session.`;
+        } else {
+            // If leave is PM only, return next working day
+            backToOfficeDate = new Date(endDate);
+            backToOfficeDate.setDate(backToOfficeDate.getDate() + 1);
+            
+            // Skip weekends
+            while (backToOfficeDate.getDay() === 0 || backToOfficeDate.getDay() === 6) {
+                backToOfficeDate.setDate(backToOfficeDate.getDate() + 1);
+            }
+            
+            backToOfficeText = `You will return to office on <strong>${formatDate(backToOfficeDate)}</strong> at 9:00 AM.`;
+        }
+        
+        infoText.innerHTML = backToOfficeText;
+        infoDiv.style.display = 'block';
+    } else {
+        infoDiv.style.display = 'none';
+        creditsDiv.style.display = 'none';
     }
+}
+
+function formatDate(date) {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
+
+// Add event listeners when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateField = document.getElementById('id_start_date');
+    const startSessionField = document.getElementById('id_start_session');
+    const endDateField = document.getElementById('id_end_date');
+    const endSessionField = document.getElementById('id_end_session');
     
-    sessionSelect.addEventListener('change', updateCreditsAndDays);
-    startDateInput.addEventListener('change', updateCreditsAndDays);
-    endDateInput.addEventListener('change', updateCreditsAndDays);
-    updateCreditsAndDays(); // Initialize on page load
+    if (startDateField && startSessionField && endDateField && endSessionField) {
+        startDateField.addEventListener('change', updateBackToOfficeInfo);
+        startSessionField.addEventListener('change', updateBackToOfficeInfo);
+        endDateField.addEventListener('change', updateBackToOfficeInfo);
+        endSessionField.addEventListener('change', updateBackToOfficeInfo);
+        
+        // Check on page load if fields are already filled
+        updateBackToOfficeInfo();
+    }
 });
 </script>
+
+<div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+    <h4>Important Notes:</h4>
+    <ul>
+        <li>Special leave can only be applied when you have sufficient credits</li>
+        <li>Credits are earned through approved special work claims</li>
+        <li>All special leave applications require manager approval</li>
+        <li>Same session logic as regular leave applications</li>
+    </ul>
+</div>
+
 {% endblock %}

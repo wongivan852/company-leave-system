@@ -1,0 +1,85 @@
+# Django
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv/
+db.sqlite3
+db.sqlite3.backup
+*.sqlite3
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+.nyc_output
+
+# node_modules (if any frontend tools)
+node_modules/
+
+# Backup files
+*.backup
+*.bak
+
+# Temporary files
+*.tmp
+*.temp
+
+# PDF files (likely test/development files)
+*.pdf
+
+# CSV files (likely test data)
+*.csv
+
+# HTML test files
+*_test.html
+dashboard_test.html
+login_result.html
+manager_dashboard.html
+manager_response.html
+
+# Cookie files
+cookies.txt
+
+# Snapshots
+.snapshots/
+
+# Claude AI files
+.claude/
+
+# Scripts that might contain sensitive info
+start.sh

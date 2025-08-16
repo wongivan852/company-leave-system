@@ -32,6 +32,11 @@
                     <a href="{% url 'leave:dashboard' %}" class="nav-link">
                         <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
                     </a>
+                    {% if user.username == 'admin' or user.username == 'magneoh' or user.is_superuser %}
+                    <a href="{% url 'leave:manager_dashboard' %}" class="nav-link">
+                        <i class="fas fa-user-tie mr-1"></i>Manager
+                    </a>
+                    {% endif %}
                     <a href="{% url 'leave:logout' %}" class="nav-link">
                         <i class="fas fa-sign-out-alt mr-1"></i>Logout
                     </a>

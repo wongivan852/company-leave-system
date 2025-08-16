@@ -91,13 +91,13 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="{{ form.start_time.id_for_label }}" class="font-weight-bold">
-                                        <i class="fas fa-clock mr-1"></i>Start Time: <span class="text-danger">*</span>
+                                    <label for="{{ form.start_session.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-clock mr-1"></i>Start Session: <span class="text-danger">*</span>
                                     </label>
-                                    {{ form.start_time }}
-                                    <small class="form-text text-muted">AM = 9:00, PM = 13:00 (1:00 PM)</small>
-                                    {% if form.start_time.errors %}
-                                        <div class="text-danger small mt-1">{{ form.start_time.errors }}</div>
+                                    {{ form.start_session }}
+                                    <small class="form-text text-muted">AM: 9:00am-1:00pm, PM: 2:00pm-6:00pm</small>
+                                    {% if form.start_session.errors %}
+                                        <div class="text-danger small mt-1">{{ form.start_session.errors }}</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -117,44 +117,25 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="{{ form.end_time.id_for_label }}" class="font-weight-bold">
-                                        <i class="fas fa-clock mr-1"></i>End Time: <span class="text-danger">*</span>
+                                    <label for="{{ form.end_session.id_for_label }}" class="font-weight-bold">
+                                        <i class="fas fa-clock mr-1"></i>End Session: <span class="text-danger">*</span>
                                     </label>
-                                    {{ form.end_time }}
-                                    <small class="form-text text-muted">AM = 13:00 (1:00 PM), PM = 18:00 (6:00 PM)</small>
-                                    {% if form.end_time.errors %}
-                                        <div class="text-danger small mt-1">{{ form.end_time.errors }}</div>
+                                    {{ form.end_session }}
+                                    <small class="form-text text-muted">AM: 9:00am-1:00pm, PM: 2:00pm-6:00pm</small>
+                                    {% if form.end_session.errors %}
+                                        <div class="text-danger small mt-1">{{ form.end_session.errors }}</div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Date Back to Work Row -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="{{ form.date_back_to_work.id_for_label }}" class="font-weight-bold">
-                                        <i class="fas fa-calendar-check mr-1"></i>Date Back to Work:
-                                    </label>
-                                    {{ form.date_back_to_work }}
-                                    <small class="form-text text-muted">{{ form.date_back_to_work.help_text }}</small>
-                                    {% if form.date_back_to_work.errors %}
-                                        <div class="text-danger small mt-1">{{ form.date_back_to_work.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="font-weight-bold">
-                                        <i class="fas fa-calendar-day mr-1"></i>Total Leave Period:
-                                    </label>
-                                    <div class="form-control-plaintext" id="total-leave-period" style="font-weight: bold; color: #007bff;">
-                                        Will be calculated automatically
-                                    </div>
-                                    <small class="form-text text-muted">Total days of leave applied for</small>
-                                </div>
-                            </div>
+                        <!-- Back to Office Info -->
+                        <div class="alert alert-info" id="back-to-office-info" style="display: none;">
+                            <h6><i class="fas fa-calendar-check mr-2"></i>Back to Office Information</h6>
+                            <p class="mb-0" id="back-to-office-text"></p>
                         </div>
+                        
+                        <!-- Reason Row -->
                         
                         <div class="form-group">
                             <label for="{{ form.reason.id_for_label }}" class="font-weight-bold">
@@ -166,16 +147,6 @@
                             {% endif %}
                         </div>
                         
-                        <div class="form-group">
-                            <label for="{{ form.certificate.id_for_label }}" class="font-weight-bold">
-                                <i class="fas fa-file-medical mr-1"></i>Medical Certificate/Supporting Document:
-                            </label>
-                            <small class="form-text text-muted mb-2">Optional - Upload for sick leave (JPEG, PNG, PDF)</small>
-                            {{ form.certificate }}
-                            {% if form.certificate.errors %}
-                                <div class="text-danger small mt-1">{{ form.certificate.errors }}</div>
-                            {% endif %}
-                        </div>
                         
                         <!-- Saturday Working Day Notice -->
                         <div id="saturday-notice" class="alert alert-warning" style="display: none;">
@@ -408,23 +379,63 @@ function validateDateSelection() {
     }
 }
 
+// Session-based calculation function
+function updateBackToOfficeInfo() {
+    const startDate = document.getElementById('id_start_date').value;
+    const startSession = document.getElementById('id_start_session').value;
+    const endDate = document.getElementById('id_end_date').value;
+    const endSession = document.getElementById('id_end_session').value;
+    const infoDiv = document.getElementById('back-to-office-info');
+    const infoText = document.getElementById('back-to-office-text');
+    
+    if (startDate && startSession && endDate && endSession) {
+        let backToOfficeDate;
+        let backToOfficeText;
+        
+        // If leave starts with AM session, return same day
+        if (startSession === 'AM') {
+            backToOfficeDate = new Date(startDate);
+            backToOfficeText = `You will return to office on <strong>${formatDate(backToOfficeDate)}</strong> (same day) at 2:00 PM since your leave starts with AM session.`;
+        } else {
+            // If leave is PM only, return next working day
+            backToOfficeDate = new Date(endDate);
+            backToOfficeDate.setDate(backToOfficeDate.getDate() + 1);
+            
+            // Skip weekends
+            while (backToOfficeDate.getDay() === 0 || backToOfficeDate.getDay() === 6) {
+                backToOfficeDate.setDate(backToOfficeDate.getDate() + 1);
+            }
+            
+            backToOfficeText = `You will return to office on <strong>${formatDate(backToOfficeDate)}</strong> at 9:00 AM.`;
+        }
+        
+        infoText.innerHTML = backToOfficeText;
+        infoDiv.style.display = 'block';
+    } else {
+        infoDiv.style.display = 'none';
+    }
+}
+
+function formatDate(date) {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
+
 // Add event listeners when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     const startDateField = document.getElementById('id_start_date');
+    const startSessionField = document.getElementById('id_start_session');
     const endDateField = document.getElementById('id_end_date');
-    const startTimeField = document.getElementById('id_start_time');
-    const endTimeField = document.getElementById('id_end_time');
+    const endSessionField = document.getElementById('id_end_session');
     
-    if (startDateField && endDateField) {
-        startDateField.addEventListener('change', validateDateSelection);
-        endDateField.addEventListener('change', validateDateSelection);
+    if (startDateField && startSessionField && endDateField && endSessionField) {
+        startDateField.addEventListener('change', updateBackToOfficeInfo);
+        startSessionField.addEventListener('change', updateBackToOfficeInfo);
+        endDateField.addEventListener('change', updateBackToOfficeInfo);
+        endSessionField.addEventListener('change', updateBackToOfficeInfo);
         
-        // Also listen to time field changes for calculations
-        if (startTimeField) startTimeField.addEventListener('change', validateDateSelection);
-        if (endTimeField) endTimeField.addEventListener('change', validateDateSelection);
-        
-        // Check on page load if dates are already filled
-        validateDateSelection();
+        // Check on page load if fields are already filled
+        updateBackToOfficeInfo();
     }
 });
 </script>

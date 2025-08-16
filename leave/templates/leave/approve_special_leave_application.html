@@ -1,0 +1,162 @@
+{% extends "leave/base.html" %}
+
+{% block title %}Approve Special Leave Application{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-star mr-2"></i>Approve Special Leave Application
+                    </h4>
+                    <div class="mt-2">
+                        <a href="{% url 'leave:manager_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left mr-1"></i>Back to Manager Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Application Details -->
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+                                <h5 style="color: #2c3e50; margin-top: 0;">Special Leave Application Details</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Employee:</strong><br>
+                                        {{ application.employee.user.get_full_name }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Email:</strong><br>
+                                        {{ application.employee.user.email }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Credits Used:</strong><br>
+                                        <span class="badge badge-warning badge-lg">{{ application.credits_used|floatformat:1 }} credits</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Total Duration:</strong><br>
+                                        <span class="badge badge-info badge-lg">{{ application.days_applied }} day{% if application.days_applied > 1 %}s{% endif %}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Start:</strong><br>
+                                        {{ application.date_from|date:"l, F d, Y" }}<br>
+                                        <small class="text-muted">{% if application.date_from.hour == 9 %}AM (9:00am - 1:00pm){% else %}PM (2:00pm - 6:00pm){% endif %}</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>End:</strong><br>
+                                        {{ application.date_to|date:"l, F d, Y" }}<br>
+                                        <small class="text-muted">{% if application.date_to.hour <= 13 %}AM (9:00am - 1:00pm){% else %}PM (2:00pm - 6:00pm){% endif %}</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Date Back to Work:</strong><br>
+                                        {{ date_back_to_work|date:"l, F d, Y" }}
+                                        {% if application.date_from.hour == 9 %}
+                                            <small class="text-muted">(PM - 2:00pm)</small>
+                                        {% else %}
+                                            <small class="text-muted">(AM - 9:00am)</small>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Applied On:</strong><br>
+                                        {{ application.created_at|date:"F d, Y \a\t g:i A" }}
+                                    </div>
+                                </div>
+                                
+                                {% if application.reason %}
+                                <div class="mb-3">
+                                    <strong>Reason for Special Leave:</strong><br>
+                                    <div style="background: white; padding: 10px; border-radius: 3px; border: 1px solid #ddd; margin-top: 5px;">
+                                        {{ application.reason }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-user-circle mr-2"></i>Employee Information
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Department:</strong><br>{{ application.employee.department|default:"Not specified" }}</p>
+                                    <p><strong>Position:</strong><br>{{ application.employee.position|default:"Not specified" }}</p>
+                                    <p><strong>Employee ID:</strong><br>{{ application.employee.employee_id }}</p>
+                                    <p><strong>Region:</strong><br>{{ application.employee.get_region_display }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-3">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-balance-scale mr-2"></i>Credit Balance Impact
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    {% with balance=application.employee.special_leave_balance %}
+                                    <p><strong>Current Earned:</strong> {{ balance.earned|floatformat:1 }}</p>
+                                    <p><strong>Current Used:</strong> {{ balance.used|floatformat:1 }}</p>
+                                    <p><strong>Current Balance:</strong> {{ balance.balance|floatformat:1 }}</p>
+                                    <hr>
+                                    <p><strong>Will Use:</strong> <span class="text-warning">{{ application.credits_used|floatformat:1 }}</span></p>
+                                    <p><strong>Balance After Approval:</strong> 
+                                        <span class="{% if balance.balance|floatformat:1|add:application.credits_used|floatformat:1|cut:'-' >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {{ balance.balance|add:application.credits_used|floatformat:1 }}
+                                        </span>
+                                    </p>
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Approval Form -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0">
+                                <i class="fas fa-clipboard-check mr-2"></i>Manager Decision
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="comment"><strong>Comments (Optional):</strong></label>
+                                    <textarea name="comment" id="comment" class="form-control" rows="3" placeholder="Add any comments about this special leave application..."></textarea>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <button type="submit" name="action" value="approve" class="btn btn-success btn-lg mr-3">
+                                        <i class="fas fa-check mr-2"></i>Approve Application ({{ application.credits_used|floatformat:1 }} credits)
+                                    </button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger btn-lg mr-3">
+                                        <i class="fas fa-times mr-2"></i>Reject Application
+                                    </button>
+                                    <a href="{% url 'leave:manager_dashboard' %}" class="btn btn-secondary btn-lg">
+                                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

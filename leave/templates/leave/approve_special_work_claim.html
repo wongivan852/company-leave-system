@@ -1,0 +1,164 @@
+{% extends "leave/base.html" %}
+
+{% block title %}Approve Special Work Claim{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-clock mr-2"></i>Approve Special Work Claim
+                    </h4>
+                    <div class="mt-2">
+                        <a href="{% url 'leave:manager_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left mr-1"></i>Back to Manager Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Claim Details -->
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+                                <h5 style="color: #2c3e50; margin-top: 0;">Work Claim Details</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Employee:</strong><br>
+                                        {{ claim.employee.user.get_full_name }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Email:</strong><br>
+                                        {{ claim.employee.user.email }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Work Date(s):</strong><br>
+                                        {{ claim.work_date|date:"l, F d, Y" }}
+                                        {% if claim.work_end_date and claim.work_end_date != claim.work_date %}
+                                            <br><small class="text-muted">to {{ claim.work_end_date|date:"l, F d, Y" }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Session & Duration:</strong><br>
+                                        <span class="badge badge-info badge-lg">{{ claim.get_session_display }}</span><br>
+                                        <small class="text-muted">{{ claim.get_work_days_count }} day{% if claim.get_work_days_count > 1 %}s{% endif %}</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Credits Earned:</strong><br>
+                                        <span class="badge badge-success badge-lg">{{ claim.credits_earned|floatformat:1 }} credits</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Priority:</strong><br>
+                                        <span class="badge badge-{% if claim.priority == 'urgent' %}danger{% elif claim.priority == 'high' %}warning{% elif claim.priority == 'medium' %}info{% else %}secondary{% endif %} badge-lg">
+                                            {{ claim.get_priority_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <strong>Event/Project Name:</strong><br>
+                                        <div style="background: white; padding: 10px; border-radius: 3px; border: 1px solid #ddd; margin-top: 5px;">
+                                            {{ claim.event_name }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <strong>Description:</strong><br>
+                                        <div style="background: white; padding: 10px; border-radius: 3px; border: 1px solid #ddd; margin-top: 5px;">
+                                            {{ claim.description }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Submitted On:</strong><br>
+                                        {{ claim.created_at|date:"F d, Y \a\t g:i A" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-user-circle mr-2"></i>Employee Information
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Department:</strong><br>{{ claim.employee.department|default:"Not specified" }}</p>
+                                    <p><strong>Position:</strong><br>{{ claim.employee.position|default:"Not specified" }}</p>
+                                    <p><strong>Employee ID:</strong><br>{{ claim.employee.employee_id }}</p>
+                                    <p><strong>Region:</strong><br>{{ claim.employee.get_region_display }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-3">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-coins mr-2"></i>Credits Calculation
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Work Days:</strong> {{ claim.get_work_days_count }}</p>
+                                    <p><strong>Session Type:</strong> {{ claim.get_session_display }}</p>
+                                    {% if claim.session == 'FULL' %}
+                                        <p><strong>Credits per Day:</strong> 1.0</p>
+                                    {% else %}
+                                        <p><strong>Credits per Day:</strong> 0.5</p>
+                                    {% endif %}
+                                    <hr>
+                                    <p><strong>Total Credits:</strong> <span class="badge badge-success">{{ claim.credits_earned|floatformat:1 }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Approval Form -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0">
+                                <i class="fas fa-clipboard-check mr-2"></i>Manager Decision
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="comment"><strong>Comments:</strong></label>
+                                    <textarea name="comment" id="comment" class="form-control" rows="3" placeholder="Add comments about this work claim..." required></textarea>
+                                    <small class="form-text text-muted">Required: Please provide feedback about this work claim.</small>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <button type="submit" name="action" value="approve" class="btn btn-success btn-lg mr-3">
+                                        <i class="fas fa-check mr-2"></i>Approve Claim ({{ claim.credits_earned|floatformat:1 }} credits)
+                                    </button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger btn-lg mr-3">
+                                        <i class="fas fa-times mr-2"></i>Reject Claim
+                                    </button>
+                                    <a href="{% url 'leave:manager_dashboard' %}" class="btn btn-secondary btn-lg">
+                                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

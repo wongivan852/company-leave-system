@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from leave.models import EmployeeProfile, LeaveType, LeaveBalance
+from leave.models import Employee, LeaveType
 from datetime import datetime
 import csv
 
@@ -104,9 +104,15 @@ class Command(BaseCommand):
                         valid_companies = ['Krystal Institute Ltd', 'Krystal Technology Ltd', 'Other']
                         company_value = company if company in valid_companies else 'Krystal Institute Ltd'
                         
-                        profile, profile_created = EmployeeProfile.objects.get_or_create(
+                        # Generate employee ID
+                        employee_id = f"EMP{user.id:04d}"
+                        
+                        profile, profile_created = Employee.objects.get_or_create(
                             user=user,
                             defaults={
+                                'employee_id': employee_id,
+                                'department': 'To Be Assigned',
+                                'position': 'To Be Assigned',
                                 'date_joined': join_date,
                                 'region': region if region in ['HK', 'CN'] else 'HK',
                                 'company': company_value
@@ -117,46 +123,16 @@ class Command(BaseCommand):
                             profile.date_joined = join_date
                             profile.region = region if region in ['HK', 'CN'] else 'HK'
                             profile.company = company_value
+                            if not profile.employee_id:
+                                profile.employee_id = employee_id
                             profile.save()
                         
-                        # Create leave balances if provided
-                        current_year = datetime.now().year
-                        
-                        if annual_leave_balance and float(annual_leave_balance) > 0:
-                            try:
-                                annual_leave_type = LeaveType.objects.get(name='Annual Leave')
-                                balance, _ = LeaveBalance.objects.get_or_create(
-                                    employee=profile,
-                                    leave_type=annual_leave_type,
-                                    year=current_year,
-                                    defaults={
-                                        'balance': float(annual_leave_balance),
-                                        'taken': 0
-                                    }
-                                )
-                                if not _ and update:  # Update existing balance
-                                    balance.balance = float(annual_leave_balance)
-                                    balance.save()
-                            except (LeaveType.DoesNotExist, ValueError):
-                                pass
-                        
-                        if sick_leave_balance and float(sick_leave_balance) > 0:
-                            try:
-                                sick_leave_type = LeaveType.objects.get(name='Sick Leave')
-                                balance, _ = LeaveBalance.objects.get_or_create(
-                                    employee=profile,
-                                    leave_type=sick_leave_type,
-                                    year=current_year,
-                                    defaults={
-                                        'balance': float(sick_leave_balance),
-                                        'taken': 0
-                                    }
-                                )
-                                if not _ and update:  # Update existing balance
-                                    balance.balance = float(sick_leave_balance)
-                                    balance.save()
-                            except (LeaveType.DoesNotExist, ValueError):
-                                pass
+                        # Note: Leave balance functionality not implemented yet
+                        # This would require a LeaveBalance model to be created
+                        if annual_leave_balance or sick_leave_balance:
+                            self.stdout.write(
+                                self.style.WARNING(f'Row {row_num}: Leave balance import skipped (LeaveBalance model not implemented)')
+                            )
                                 
                     except Exception as e:
                         self.stdout.write(

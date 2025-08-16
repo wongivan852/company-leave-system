@@ -1,0 +1,108 @@
+{% extends "leave/base.html" %}
+
+{% block title %}Staff Registration - Company Leave System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Staff Registration</h3>
+                <p class="text-muted mb-0">Register for access to the Company Leave System</p>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name *</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.first_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name *</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.last_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.other_name.id_for_label }}" class="form-label">Other Name</label>
+                        {{ form.other_name }}
+                        <div class="form-text">Optional: Middle name, preferred name, etc.</div>
+                        {% if form.other_name.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.other_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email Address *</label>
+                        {{ form.email }}
+                        <div class="form-text">This will be your username for logging in.</div>
+                        {% if form.email.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.office_location.id_for_label }}" class="form-label">Office Location *</label>
+                        {{ form.office_location }}
+                        {% if form.office_location.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.office_location.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Submit Registration</button>
+                        <a href="{% url 'leave:login' %}" class="btn btn-outline-secondary">Back to Login</a>
+                    </div>
+                </form>
+
+                <div class="mt-4 p-3 bg-light rounded">
+                    <h6>What happens next?</h6>
+                    <ol class="mb-0 small">
+                        <li>Your registration will be reviewed by HR/Admin</li>
+                        <li>You'll receive an email confirmation once approved</li>
+                        <li>Login credentials will be provided via email</li>
+                        <li>You can then access the leave management system</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
