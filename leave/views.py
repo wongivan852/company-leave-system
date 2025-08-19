@@ -7,16 +7,25 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.template.loader import get_template
 # weasyprint will be imported dynamically when needed
-from .models import LeaveApplication, LeaveType, Employee, SpecialWorkClaim, SpecialLeaveApplication, SpecialLeaveBalance
-from .forms import LeaveApplicationForm, SpecialWorkClaimForm, SpecialLeaveApplicationForm
+from .models import LeaveApplication, LeaveType, Employee, SpecialWorkClaim, SpecialLeaveApplication, SpecialLeaveBalance, EmployeeImport, LeaveBalance
+from .forms import LeaveApplicationForm, SpecialWorkClaimForm, SpecialLeaveApplicationForm, EmployeeImportForm
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
+import csv
+import io
+from decimal import Decimal
+from django.db import transaction
+from django.http import JsonResponse
 
 def is_manager(user):
     """Check if user is admin or magneoh (managers)"""
     return user.is_authenticated and (user.username in ['admin', 'magneoh'] or user.is_superuser)
+
+def is_staff_or_manager(user):
+    """Check if user is staff or manager"""
+    return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 def calculate_return_date(date_to):
     """Calculate the return to work date based on the leave end date."""
@@ -229,20 +238,332 @@ def holiday_add(request):
     return render(request, 'leave/holiday_add.html', {'message': 'Feature coming soon'})
 
 @login_required
+@user_passes_test(is_staff_or_manager)
 def employee_import(request):
-    return render(request, 'leave/employee_import.html', {'message': 'Feature coming soon'})
+    """Handle employee CSV import functionality"""
+    if request.method == 'POST':
+        form = EmployeeImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = form.cleaned_data['csv_file']
+            
+            # Create import record
+            import_record = EmployeeImport.objects.create(
+                file_name=csv_file.name,
+                uploaded_by=request.user,
+                status='processing'
+            )
+            
+            try:
+                # Process the CSV file
+                result = process_employee_csv(csv_file, import_record, request.user)
+                
+                # Update import record with results
+                import_record.status = result['status']
+                import_record.total_rows = result['total_rows']
+                import_record.created_count = result['created_count']
+                import_record.updated_count = result['updated_count']
+                import_record.error_count = result['error_count']
+                import_record.import_log = result['log']
+                import_record.csv_content = result['csv_content']
+                import_record.save()
+                
+                if result['status'] == 'success':
+                    messages.success(request, f"Successfully imported {result['created_count']} employees and updated {result['updated_count']} employees.")
+                elif result['status'] == 'partial':
+                    messages.warning(request, f"Import completed with some errors. {result['created_count']} created, {result['updated_count']} updated, {result['error_count']} errors.")
+                else:
+                    messages.error(request, f"Import failed. Check the import history for details.")
+                
+                return redirect('leave:import_history')
+                
+            except Exception as e:
+                import_record.status = 'failed'
+                import_record.import_log = f"Fatal error during import: {str(e)}"
+                import_record.save()
+                messages.error(request, f"Import failed: {str(e)}")
+                
+    else:
+        form = EmployeeImportForm()
+    
+    return render(request, 'leave/employee_import.html', {'form': form})
 
 @login_required
+@user_passes_test(is_staff_or_manager)
 def import_history(request):
-    return render(request, 'leave/import_history.html', {'message': 'Feature coming soon'})
+    """Display import history"""
+    imports = EmployeeImport.objects.all().order_by('-upload_date')
+    return render(request, 'leave/import_history.html', {'imports': imports})
 
 @login_required
+@user_passes_test(is_staff_or_manager)
 def view_import_content(request, import_id):
-    return render(request, 'leave/view_import.html', {'message': 'Feature coming soon'})
+    """Download processed CSV content from import record"""
+    import_record = get_object_or_404(EmployeeImport, id=import_id)
+    
+    if import_record.csv_content:
+        response = HttpResponse(import_record.csv_content, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="processed_{import_record.file_name}"'
+        return response
+    else:
+        messages.error(request, "No CSV content available for this import.")
+        return redirect('leave:import_history')
 
 @login_required
 def download_balances(request):
-    return HttpResponse('Feature coming soon')
+    """Download employee leave balances as CSV"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="employee_balances.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow([
+        'Employee ID', 'Name', 'Email', 'Department', 'Region',
+        'Leave Type', 'Year', 'Opening Balance', 'Carried Forward',
+        'Current Year Entitlement', 'Taken', 'Available Balance'
+    ])
+    
+    # Get all employees with their leave balances
+    employees = Employee.objects.select_related('user').prefetch_related('leave_balances').all()
+    
+    for employee in employees:
+        balances = employee.leave_balances.all()
+        if balances:
+            for balance in balances:
+                writer.writerow([
+                    employee.employee_id,
+                    employee.user.get_full_name(),
+                    employee.user.email,
+                    employee.department,
+                    employee.get_region_display(),
+                    balance.leave_type.name,
+                    balance.year,
+                    balance.opening_balance,
+                    balance.carried_forward,
+                    balance.current_year_entitlement,
+                    balance.taken,
+                    balance.balance
+                ])
+        else:
+            # Employee with no leave balances
+            writer.writerow([
+                employee.employee_id,
+                employee.user.get_full_name(),
+                employee.user.email,
+                employee.department,
+                employee.get_region_display(),
+                'No leave types assigned',
+                '',
+                '',
+                '',
+                '',
+                '',
+                ''
+            ])
+    
+    return response
+
+def process_employee_csv(csv_file, import_record, user):
+    """Process the CSV file and import/update employees"""
+    log_messages = []
+    created_count = 0
+    updated_count = 0
+    error_count = 0
+    
+    try:
+        # Read and decode the CSV file
+        csv_file.seek(0)
+        content = csv_file.read().decode('utf-8')
+        csv_reader = csv.DictReader(io.StringIO(content))
+        
+        # Track processed content for download
+        processed_rows = []
+        processed_rows.append(list(csv_reader.fieldnames) + ['Import Status', 'Notes'])
+        
+        total_rows = 0
+        
+        with transaction.atomic():
+            for row_num, row in enumerate(csv_reader, start=2):
+                total_rows += 1
+                status = 'Success'
+                notes = ''
+                
+                try:
+                    # Extract required fields
+                    username = row.get('username', '').strip()
+                    email = row.get('email', '').strip()
+                    first_name = row.get('first_name', '').strip()
+                    last_name = row.get('last_name', '').strip()
+                    
+                    # Optional fields
+                    date_joined = row.get('date_joined', '').strip()
+                    region = row.get('region', 'HK').strip()
+                    is_staff = row.get('is_staff', 'FALSE').strip().upper() == 'TRUE'
+                    department = row.get('department', 'General').strip()
+                    position = row.get('position', 'Staff').strip()
+                    company = row.get('company', 'Krystal Institute Ltd').strip()
+                    
+                    # Leave balance fields
+                    annual_leave = float(row.get('annual_leave_balance', 0) or 0)
+                    sick_leave = float(row.get('sick_leave_balance', 0) or 0)
+                    
+                    # Validate required fields
+                    if not all([username, email, first_name, last_name]):
+                        raise ValueError("Missing required fields: username, email, first_name, last_name")
+                    
+                    # Parse date_joined
+                    join_date = None
+                    if date_joined:
+                        try:
+                            join_date = datetime.strptime(date_joined, '%Y-%m-%d').date()
+                        except ValueError:
+                            try:
+                                join_date = datetime.strptime(date_joined, '%m/%d/%Y').date()
+                            except ValueError:
+                                notes += "Invalid date format; "
+                    
+                    # Create or update user
+                    user_obj, user_created = User.objects.get_or_create(
+                        username=username,
+                        defaults={
+                            'email': email,
+                            'first_name': first_name,
+                            'last_name': last_name,
+                            'is_staff': is_staff
+                        }
+                    )
+                    
+                    if not user_created:
+                        # Update existing user
+                        user_obj.email = email
+                        user_obj.first_name = first_name
+                        user_obj.last_name = last_name
+                        user_obj.is_staff = is_staff
+                        user_obj.save()
+                        notes += "Updated user; "
+                    else:
+                        notes += "Created user; "
+                    
+                    # Create or update employee profile
+                    employee, emp_created = Employee.objects.get_or_create(
+                        user=user_obj,
+                        defaults={
+                            'employee_id': f"EMP{user_obj.id:04d}",
+                            'department': department,
+                            'position': position,
+                            'company': company,
+                            'date_joined': join_date,
+                            'region': region
+                        }
+                    )
+                    
+                    if not emp_created:
+                        # Update existing employee
+                        employee.department = department
+                        employee.position = position
+                        employee.company = company
+                        if join_date:
+                            employee.date_joined = join_date
+                        employee.region = region
+                        employee.save()
+                        updated_count += 1
+                        notes += "Updated employee; "
+                    else:
+                        created_count += 1
+                        notes += "Created employee; "
+                    
+                    # Handle leave balances
+                    current_year = timezone.now().year
+                    
+                    # Annual Leave
+                    if annual_leave > 0:
+                        try:
+                            annual_leave_type = LeaveType.objects.get(name='Annual Leave')
+                            balance, bal_created = LeaveBalance.objects.get_or_create(
+                                employee=employee,
+                                leave_type=annual_leave_type,
+                                year=current_year,
+                                defaults={
+                                    'opening_balance': Decimal('0.00'),
+                                    'carried_forward': Decimal('0.00'),
+                                    'current_year_entitlement': Decimal(str(annual_leave)),
+                                    'taken': Decimal('0.00')
+                                }
+                            )
+                            if not bal_created:
+                                balance.current_year_entitlement = Decimal(str(annual_leave))
+                                balance.save()
+                            notes += f"Set Annual Leave: {annual_leave}; "
+                        except LeaveType.DoesNotExist:
+                            notes += "Annual Leave type not found; "
+                    
+                    # Sick Leave
+                    if sick_leave > 0:
+                        try:
+                            sick_leave_type = LeaveType.objects.get(name='Sick Leave')
+                            balance, bal_created = LeaveBalance.objects.get_or_create(
+                                employee=employee,
+                                leave_type=sick_leave_type,
+                                year=current_year,
+                                defaults={
+                                    'opening_balance': Decimal('0.00'),
+                                    'carried_forward': Decimal('0.00'),
+                                    'current_year_entitlement': Decimal(str(sick_leave)),
+                                    'taken': Decimal('0.00')
+                                }
+                            )
+                            if not bal_created:
+                                balance.current_year_entitlement = Decimal(str(sick_leave))
+                                balance.save()
+                            notes += f"Set Sick Leave: {sick_leave}; "
+                        except LeaveType.DoesNotExist:
+                            notes += "Sick Leave type not found; "
+                    
+                    log_messages.append(f"Row {row_num}: Successfully processed {username}")
+                    
+                except Exception as e:
+                    error_count += 1
+                    status = 'Error'
+                    notes = str(e)
+                    log_messages.append(f"Row {row_num}: Error - {str(e)}")
+                
+                # Add to processed rows
+                processed_row = list(row.values()) + [status, notes]
+                processed_rows.append(processed_row)
+        
+        # Determine overall status
+        if error_count == 0:
+            status = 'success'
+        elif error_count < total_rows:
+            status = 'partial'
+        else:
+            status = 'failed'
+        
+        # Create CSV content for download
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerows(processed_rows)
+        csv_content = output.getvalue()
+        
+        return {
+            'status': status,
+            'total_rows': total_rows,
+            'created_count': created_count,
+            'updated_count': updated_count,
+            'error_count': error_count,
+            'log': '\n'.join(log_messages),
+            'csv_content': csv_content
+        }
+        
+    except Exception as e:
+        log_messages.append(f"Fatal error: {str(e)}")
+        return {
+            'status': 'failed',
+            'total_rows': 0,
+            'created_count': 0,
+            'updated_count': 0,
+            'error_count': 1,
+            'log': '\n'.join(log_messages),
+            'csv_content': ''
+        }
 
 @login_required
 def special_work_claim(request):

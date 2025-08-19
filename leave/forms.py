@@ -316,3 +316,52 @@ class SpecialLeaveApplicationForm(forms.ModelForm):
         if commit:
             application.save()
         return application
+
+
+# NEW FORM FOR EMPLOYEE IMPORT
+class EmployeeImportForm(forms.Form):
+    csv_file = forms.FileField(
+        label='CSV File',
+        widget=forms.FileInput(attrs={
+            'class': 'form-control-file',
+            'accept': '.csv',
+            'help_text': 'Upload a CSV file with employee data'
+        })
+    )
+    
+    def clean_csv_file(self):
+        file = self.cleaned_data.get('csv_file')
+        
+        if file:
+            # Check file size (limit to 5MB)
+            if file.size > 5 * 1024 * 1024:
+                raise ValidationError("File size cannot exceed 5MB.")
+            
+            # Check file extension
+            if not file.name.lower().endswith('.csv'):
+                raise ValidationError("Only CSV files are allowed.")
+            
+            # Try to read and validate CSV structure
+            try:
+                file.seek(0)  # Reset file pointer
+                content = file.read().decode('utf-8')
+                file.seek(0)  # Reset again for later use
+                
+                lines = content.split('\n')
+                if len(lines) < 2:
+                    raise ValidationError("CSV file must contain at least a header and one data row.")
+                
+                # Check for required columns
+                header = lines[0].lower()
+                required_fields = ['username', 'email', 'first_name', 'last_name']
+                missing_fields = [field for field in required_fields if field not in header]
+                
+                if missing_fields:
+                    raise ValidationError(f"Missing required columns: {', '.join(missing_fields)}")
+                    
+            except UnicodeDecodeError:
+                raise ValidationError("File must be in UTF-8 format.")
+            except Exception as e:
+                raise ValidationError(f"Error reading CSV file: {str(e)}")
+        
+        return file

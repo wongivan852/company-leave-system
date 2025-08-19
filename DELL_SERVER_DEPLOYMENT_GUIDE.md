@@ -2,13 +2,19 @@
 
 ## Overview
 
-This comprehensive guide provides production-tested instructions for deploying the Company Leave System on Dell servers running Ubuntu 24.04 LTS. Based on real-world deployment experience from CRM systems and Stripe dashboards, this guide incorporates lessons learned from actual production deployments.
+This comprehensive guide provides production-tested instructions for deploying the Company Leave System on Dell OptiPlex 3070 with Ubuntu 24.04 LTS. Based on lessons learned from previous CRM and Stripe dashboard deployments, this guide incorporates critical fixes and optimizations for Dell hardware.
 
 The Company Leave System is a Django-based application for managing employee leave requests, approvals, and holiday management with comprehensive workflow automation.
 
+## Environment Specifications
+- **Development**: macOS M4 Max (ARM64) - Current location
+- **Production Target**: Dell OptiPlex 3070 + Ubuntu 24.04 LTS
+- **Application**: Django Company Leave System (Port 8084)
+- **Database**: SQLite (dev) → PostgreSQL (production)
+
 ## Prerequisites
 
-- Dell server with Ubuntu 24.04 LTS (required for compatibility)
+- Dell OptiPlex 3070 with Ubuntu 24.04 LTS (required for compatibility)
 - Root access to the server
 - Network connectivity (intranet and internet)
 - Minimum 8GB RAM, 50GB storage (recommended: 16GB RAM, 100GB storage)
@@ -21,21 +27,57 @@ Internet/Intranet
        ↓
     Nginx (Port 80/443)
        ↓
-  Company Leave System (Port 8083)
+  Company Leave System (Port 8084)  ← Changed from 8083
        ↓
   PostgreSQL Database
 ```
 
-## Ubuntu 24.04 Compatibility Requirements
+## Critical Ubuntu 24.04 Compatibility Issues
 
-**Critical**: Ubuntu 24.04 uses externally managed Python environments. Always use system packages for Python dependencies:
+**CRITICAL**: Ubuntu 24.04 uses externally managed Python environments. Based on lessons learned:
 
+### ❌ DO NOT USE (Will Fail)
 ```bash
-# ✅ Correct for Ubuntu 24.04
-sudo apt install python3-venv python3-pip python3-dev
-
-# ❌ Incorrect - will fail on Ubuntu 24.04
 pip3 install --system virtualenv
+```
+
+### ✅ REQUIRED Installation Method
+```bash
+sudo apt install python3-venv python3-pip python3-dev
+sudo apt install python3-setuptools python3-wheel
+```
+
+## Dell Hardware Optimizations (Apply First)
+
+### Memory Configuration
+```bash
+sudo nano /etc/sysctl.conf
+
+# Add Dell OptiPlex 3070 optimized settings
+vm.swappiness=10
+vm.vfs_cache_pressure=50
+vm.dirty_ratio=15
+vm.dirty_background_ratio=5
+net.core.rmem_max=16777216
+net.core.wmem_max=16777216
+
+# Apply settings
+sudo sysctl -p
+```
+
+### CPU Optimization
+```bash
+# Set CPU governor for server workloads
+echo 'GOVERNOR="performance"' | sudo tee -a /etc/default/cpufrequtils
+sudo systemctl restart cpufrequtils
+```
+
+### Network Adapter Optimization
+```bash
+# Dell network adapter optimization
+sudo lspci | grep -E "(Network|Ethernet)"
+sudo ethtool -G eth0 rx 2048 tx 2048
+sudo ethtool -K eth0 tso on gso on
 ```
 
 ## Step 1: System Preparation
@@ -45,10 +87,11 @@ pip3 install --system virtualenv
 sudo apt update && sudo apt upgrade -y
 ```
 
-### 1.2 Install Core Dependencies
+### 1.2 Install Core Dependencies (Ubuntu 24.04 Compatible)
 ```bash
-# Python environment (Ubuntu 24.04 compatible)
+# Python environment (CRITICAL: Ubuntu 24.04 compatible)
 sudo apt install -y python3 python3-venv python3-pip python3-dev
+sudo apt install -y python3-setuptools python3-wheel
 
 # Database and caching
 sudo apt install -y postgresql postgresql-contrib redis-server
@@ -68,7 +111,7 @@ sudo apt install -y htop iotop netstat lsof
 # Configure UFW firewall
 sudo ufw allow ssh
 sudo ufw allow 'Nginx Full'
-sudo ufw allow 8083/tcp comment 'Company Leave System'
+sudo ufw allow 8084/tcp comment 'Company Leave System'
 sudo ufw enable
 
 # Configure fail2ban
@@ -173,11 +216,11 @@ CONN_MAX_AGE=600
 # Redis Configuration
 REDIS_URL=redis://:your_redis_password@localhost:6379/0
 
-# Network Configuration
+# Network Configuration (Dell Server)
 HOST=0.0.0.0
-PORT=8083
-ALLOWED_HOSTS=your-server-ip,your-domain.com,localhost,127.0.0.1,192.168.0.104
-CSRF_TRUSTED_ORIGINS=https://your-server-ip,https://your-domain.com
+PORT=8084
+ALLOWED_HOSTS=192.168.0.104,localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=https://192.168.0.104,http://192.168.0.104
 
 # Company Configuration
 COMPANY_NAME=Your Company Name
@@ -208,11 +251,13 @@ LOG_LEVEL=INFO
 LOG_FILE=/var/log/company-leave-system/leave-system.log
 ERROR_LOG_FILE=/var/log/company-leave-system/error.log
 
-# Performance Configuration (Based on Dell Server Testing)
+# Performance Configuration (Dell OptiPlex 3070 Optimized)
 WORKER_PROCESSES=3
 WORKER_TIMEOUT=120
 MAX_REQUESTS=1000
 KEEPALIVE=2
+# CRITICAL: Based on Production Experience
+WATCHDOG_TIMEOUT=120
 
 # Backup Configuration
 BACKUP_RETENTION_DAYS=30
@@ -360,7 +405,7 @@ ExecStart=/opt/company-leave-system/venv/bin/gunicorn \
     --max-requests 1000 \
     --max-requests-jitter 50 \
     --keepalive 2 \
-    --bind 0.0.0.0:8083 \
+    --bind 0.0.0.0:8084 \
     --user leavesys \
     --group leavesys \
     --access-logfile /var/log/company-leave-system/access.log \
@@ -418,7 +463,7 @@ limit_req_status 429;
 
 # Upstream configuration
 upstream leave_system_backend {
-    server 127.0.0.1:8083 max_fails=3 fail_timeout=30s;
+    server 127.0.0.1:8084 max_fails=3 fail_timeout=30s;
     keepalive 32;
 }
 
@@ -659,7 +704,7 @@ systemctl is-active nginx
 # Port status
 echo ""
 echo "Port Status:"
-netstat -tulpn | grep -E ":8083|:80|:443"
+netstat -tulpn | grep -E ":8084|:80|:443"
 
 # Database connection
 echo ""
@@ -684,7 +729,7 @@ fi
 # Application response
 echo ""
 echo "Application Response:"
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8083/health 2>/dev/null | grep -q "200"
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8084/health 2>/dev/null | grep -q "200"
 if [ $? -eq 0 ]; then
     echo "Leave System: OK"
 else
@@ -806,7 +851,7 @@ sudo systemctl status company-leave-system postgresql redis-server nginx
 
 # Test network connectivity
 curl -k https://localhost/health
-curl http://localhost:8083/health
+curl http://localhost:8084/health
 
 # Test database connectivity
 sudo -u leavesys psql -d company_leave_system_db -c "SELECT version();"
@@ -847,14 +892,14 @@ sudo systemctl status company-leave-system
 sudo journalctl -u company-leave-system -f
 
 # Check port availability
-sudo netstat -tulpn | grep :8083
+sudo netstat -tulpn | grep :8084
 
 # Test Django application directly
 sudo -u leavesys bash -c "
 cd /opt/company-leave-system/app
 source ../venv/bin/activate
 export $(grep -v '^#' ../.env | xargs)
-python manage.py runserver 0.0.0.0:8083
+python manage.py runserver 0.0.0.0:8084
 "
 ```
 
@@ -941,7 +986,7 @@ sudo -u leavesys bash -c "source ../venv/bin/activate && python manage.py shell"
 - **HTTPS**: `https://server-ip/`
 - **Health Check**: `https://server-ip/health`
 - **Admin Panel**: `https://server-ip/admin/`
-- **Direct Access**: `http://server-ip:8083/`
+- **Direct Access**: `http://server-ip:8084/`
 
 ## Production Deployment Checklist
 
@@ -970,4 +1015,4 @@ sudo -u leavesys bash -c "source ../venv/bin/activate && python manage.py shell"
 - [ ] Application functionality tested
 - [ ] Documentation updated with server-specific details
 
-This deployment guide ensures a secure, scalable, and maintainable installation of the Company Leave System on your Dell server with optimal performance and reliability, using port 8083 for the application service.
+This deployment guide ensures a secure, scalable, and maintainable installation of the Company Leave System on your Dell OptiPlex 3070 with optimal performance and reliability, using port 8084 for the application service.

@@ -2,7 +2,11 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib import messages
-from .models import Employee, LeaveType, LeaveApplication, PendingRegistration
+from .models import (
+    Employee, LeaveType, LeaveApplication, PendingRegistration,
+    SpecialWorkClaim, SpecialLeaveApplication, SpecialLeaveBalance,
+    EmployeeImport, LeaveBalance
+)
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
@@ -24,6 +28,42 @@ class LeaveApplicationAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     readonly_fields = ['days_applied', 'created_at', 'updated_at']
 
+@admin.register(SpecialWorkClaim)
+class SpecialWorkClaimAdmin(admin.ModelAdmin):
+    list_display = ['employee', 'event_name', 'work_date', 'session', 'status', 'credits_earned', 'created_at']
+    list_filter = ['status', 'session', 'priority', 'created_at']
+    search_fields = ['employee__user__first_name', 'employee__user__last_name', 'event_name']
+    date_hierarchy = 'created_at'
+    readonly_fields = ['credits_earned', 'created_at', 'updated_at']
+
+@admin.register(SpecialLeaveApplication)
+class SpecialLeaveApplicationAdmin(admin.ModelAdmin):
+    list_display = ['employee', 'date_from', 'date_to', 'days_applied', 'credits_used', 'status', 'created_at']
+    list_filter = ['status', 'created_at']
+    search_fields = ['employee__user__first_name', 'employee__user__last_name', 'reason']
+    date_hierarchy = 'created_at'
+    readonly_fields = ['days_applied', 'credits_used', 'created_at', 'updated_at']
+
+@admin.register(SpecialLeaveBalance)
+class SpecialLeaveBalanceAdmin(admin.ModelAdmin):
+    list_display = ['employee', 'earned', 'used', 'balance', 'year']
+    list_filter = ['year']
+    search_fields = ['employee__user__first_name', 'employee__user__last_name']
+    readonly_fields = ['balance']
+
+@admin.register(LeaveBalance)
+class LeaveBalanceAdmin(admin.ModelAdmin):
+    list_display = ['employee', 'leave_type', 'year', 'opening_balance', 'carried_forward', 'current_year_entitlement', 'taken', 'balance']
+    list_filter = ['leave_type', 'year']
+    search_fields = ['employee__user__first_name', 'employee__user__last_name']
+    readonly_fields = ['balance']
+
+@admin.register(EmployeeImport)
+class EmployeeImportAdmin(admin.ModelAdmin):
+    list_display = ['file_name', 'uploaded_by', 'upload_date', 'status', 'total_rows', 'created_count', 'updated_count', 'error_count']
+    list_filter = ['status', 'upload_date']
+    search_fields = ['file_name', 'uploaded_by__username']
+    readonly_fields = ['upload_date', 'total_rows', 'created_count', 'updated_count', 'error_count']
 
 @admin.register(PendingRegistration)
 class PendingRegistrationAdmin(admin.ModelAdmin):

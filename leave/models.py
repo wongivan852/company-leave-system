@@ -335,3 +335,49 @@ class PendingRegistration(models.Model):
     
     class Meta:
         ordering = ['-created_at']
+
+# NEW MODELS FOR IMPORT FUNCTIONALITY
+class EmployeeImport(models.Model):
+    STATUS_CHOICES = [
+        ('processing', 'Processing'),
+        ('success', 'Success'),
+        ('partial', 'Partial Success'),
+        ('failed', 'Failed'),
+    ]
+    
+    file_name = models.CharField(max_length=255)
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    upload_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing')
+    total_rows = models.PositiveIntegerField(default=0)
+    created_count = models.PositiveIntegerField(default=0)
+    updated_count = models.PositiveIntegerField(default=0)
+    error_count = models.PositiveIntegerField(default=0)
+    import_log = models.TextField(blank=True)
+    csv_content = models.TextField(blank=True)  # Store processed CSV for download
+    
+    def __str__(self):
+        return f"{self.file_name} - {self.status} ({self.upload_date})"
+    
+    class Meta:
+        ordering = ['-upload_date']
+
+class LeaveBalance(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='leave_balances')
+    leave_type = models.ForeignKey(LeaveType, on_delete=models.CASCADE)
+    year = models.PositiveIntegerField(default=2025)
+    opening_balance = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    carried_forward = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    current_year_entitlement = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    taken = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    
+    @property
+    def balance(self):
+        return self.opening_balance + self.carried_forward + self.current_year_entitlement - self.taken
+    
+    def __str__(self):
+        return f"{self.employee} - {self.leave_type} ({self.year}): {self.balance}"
+    
+    class Meta:
+        unique_together = ['employee', 'leave_type', 'year']
+        ordering = ['employee__user__last_name', 'leave_type__name']
