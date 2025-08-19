@@ -1,0 +1,2376 @@
+[
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "user"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "leave",
+    "model": "employee"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "leave",
+    "model": "leavetype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "leave",
+    "model": "leaveapplication"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "leave",
+    "model": "pendingregistration"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "leave",
+    "model": "specialworkclaim"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "leave",
+    "model": "specialleavebalance"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "leave",
+    "model": "specialleaveapplication"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "leave",
+    "model": "employeeimport"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "leave",
+    "model": "leavebalance"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "08lzgj6h1qx73bdqy3hzjdn0xf9ill89",
+  "fields": {
+    "session_data": ".eJxVizEOwjAMRe-SGVUxdmqHEYlzRE7jKhWFgVAWxN0pqANMX3rvv6dLutxrWprd0lTcwYG43S_MOpzt-jGz6cO6r9lg604Xnebjdvnrqra6RryHyIYk4ClzzFEEPYXIPQtgGWL22AuwotkYCILvkWydzCNZie71BpNFMxg:1umpGS:iPdX8jpwpSuRMvy2LcnfwN6caoJoXDgSI7zRYLE9mqI",
+    "expire_date": "2025-08-29T02:54:16.168"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "7jv307stiz83q4weyax4818fs00rscom",
+  "fields": {
+    "session_data": ".eJxVizEOwjAMRe-SGVUxdmqHEYlzRE7jKhWFgVAWxN0pqANMX3rvv6dLutxrWprd0lTcwYG43S_MOpzt-jGz6cO6r9lg604Xnebjdvnrqra6RryHyIYk4ClzzFEEPYXIPQtgGWL22AuwotkYCILvkWydzCNZie71BpNFMxg:1umpDF:xk4KyIIK-b5X2oUrX1jqH4Q86i2cEFFpAhjzsp5sNLs",
+    "expire_date": "2025-08-29T02:50:57.054"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "85hkeh9olm5b69kmjinx6l398mgy1kks",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO_iGVWxkzQJIxLniJzaUSoKA6EsiLvzUQdY3-cBmddby2vXa54F9oCw-2WFp5NePmJRvuvwNRvsw_HM83LYkr-vcW_vyUXHxk5EXpNIFS8jooRUjWERVyVKclR9JIs-lKhoi6Gq6pNioBGeL75QNHw:1umpFC:MHBm7y2J3sXn_BgcaOE4MDLhg_ab4212UWaz5ZfKgmg",
+    "expire_date": "2025-08-29T02:52:58.051"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "a229wlss0yn63llbtxhshzglb3oo5urb",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO_iGVWxkzQJIxLniJzaUSoKA6EsiLvzUQdY3-cBmddby2vXa54F9oCw-2WFp5NePmJRvuvwNRvsw_HM83LYkr-vcW_vyUXHxk5EXpNIFS8jooRUjWERVyVKclR9JIs-lKhoi6Gq6pNioBGeL75QNHw:1umpHJ:oNs8vj8U8MY0TX2coWEzgTL0OV1sY1yZFnCdlrksz3U",
+    "expire_date": "2025-08-29T02:55:09.210"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "bz5it7lg55991k2uc73ejuxp433nmex3",
+  "fields": {
+    "session_data": ".eJxVizEOwjAMRe-SGVWxSeqEEYlzRLaTKBWFgVAWxN0pqAOM_73_nibxcm9p6eWWpmwOBoLZ_UJhPZfrx8yFH2X4mg324XThaT5ul7-ucW9rpJDRcYjFysiOwEcFrYGJEKoP1Y6Ee-vEC7EgZkL0AlFVRGEd5vUG1SA0Zg:1ump88:1X0ao3EMPsqSh8xLzhTAKfNPTfi5sQj7nGuGd1_N_Ok",
+    "expire_date": "2025-08-29T02:45:40.196"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "dcdo3ygtms94saan2t1wvntr8r7d2ucc",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO_iGVWxkzQJIxLniJzaUSoKA6EsiLvzUQdY3-cBmddby2vXa54F9oCw-2WFp5NePmJRvuvwNRvsw_HM83LYkr-vcW_vyUXHxk5EXpNIFS8jooRUjWERVyVKclR9JIs-lKhoi6Gq6pNioBGeL75QNHw:1umpCO:IefQmZOE4_7VFZD9UUEdTrRz463uD8LXGjn15j-NE-U",
+    "expire_date": "2025-08-29T02:50:04.660"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "fq5dsitxev9jba7bads077q311ciq3q8",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO_iGVWxkzQJIxLniJzaUSoKA6EsiLvzUQdY3-cBmddby2vXa54F9oCw-2WFp5NePmJRvuvwNRvsw_HM83LYkr-vcW_vyUXHxk5EXpNIFS8jooRUjWERVyVKclR9JIs-lKhoi6Gq6pNioBGeL75QNHw:1umpDE:rvaLCY5cec1Z20cN-q9B9PUjM8g74NKftzRHEyErAsc",
+    "expire_date": "2025-08-29T02:50:56.983"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "ghokaacr7kpdc9v5rci5hwi33sat7ml3",
+  "fields": {
+    "session_data": ".eJxVizEOwjAMRe-SGVUxdmqHEYlzRE7jKhWFgVAWxN0pqANMX3rvv6dLutxrWprd0lTcwYG43S_MOpzt-jGz6cO6r9lg604Xnebjdvnrqra6RryHyIYk4ClzzFEEPYXIPQtgGWL22AuwotkYCILvkWydzCNZie71BpNFMxg:1umpHJ:XBg9bsHz5Qdb_Ws4qn06NfYiQe0m55ORPNTeB_-Fugg",
+    "expire_date": "2025-08-29T02:55:09.277"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "mrdbux0nhi7jectoa5n5qd4m6xt8mno1",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO_iGVWxkzQJIxLniJzaUSoKA6EsiLvzUQdY3-cBmddby2vXa54F9oCw-2WFp5NePmJRvuvwNRvsw_HM83LYkr-vcW_vyUXHxk5EXpNIFS8jooRUjWERVyVKclR9JIs-lKhoi6Gq6pNioBGeL75QNHw:1un6Fo:BR6yBo9allO8oA_pcFt8LqOVGf-mloSag6qfbn8F_zc",
+    "expire_date": "2025-08-29T21:02:44.786"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "nmkvrkbvfi4uvevqyu7bhj50ck4ovw45",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO-SGVV2_mFE4hyRnThKRWEglAVxdz7qAOv7PFSm9dbzOuSa56r2KqndL2MqJ7l8xCJ0l-lrNjim45nm5bAlf1-n0d8TaayEJjJHqsE1B8jBoBUA8kzaSNKm1FS0dy2I87HZZhEDgHgsrJ4vvsQ0YQ:1un6H5:3XaR8DTToX9uToIpe9zktSmeNai7uuWZLsmIRZMZpU4",
+    "expire_date": "2025-08-29T21:04:03.795"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "notq20gtxsez6n8td5buu8wrw6kfmhw8",
+  "fields": {
+    "session_data": ".eJxVizEOwjAMRe-SGVUxdmqHEYlzRE7jKhWFgVAWxN0pqANMX3rvv6dLutxrWprd0lTcwYG43S_MOpzt-jGz6cO6r9lg604Xnebjdvnrqra6RryHyIYk4ClzzFEEPYXIPQtgGWL22AuwotkYCILvkWydzCNZie71BpNFMxg:1un6Fo:RZ2ipY0_xUuv5ebnUXFNSXGI_tfLlSDxiC9IDJ9sPsA",
+    "expire_date": "2025-08-29T21:02:44.861"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "pyht1rm8r0nxo56lzx8dlcxjjjkd2q4e",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO_iGVWxkzQJIxLniJzaUSoKA6EsiLvzUQdY3-cBmddby2vXa54F9oCw-2WFp5NePmJRvuvwNRvsw_HM83LYkr-vcW_vyUXHxk5EXpNIFS8jooRUjWERVyVKclR9JIs-lKhoi6Gq6pNioBGeL75QNHw:1umpCx:cX8KS_kecKGXzoVYrlN1iRY9txY9CD_f5QOc-Hh41s8",
+    "expire_date": "2025-08-29T02:50:39.987"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "tfa1jo4xycnkxduojbspor61m8rpzu9r",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO_iGVWxkzQJIxLniJzaUSoKA6EsiLvzUQdY3-cBmddby2vXa54F9oCw-2WFp5NePmJRvuvwNRvsw_HM83LYkr-vcW_vyUXHxk5EXpNIFS8jooRUjWERVyVKclR9JIs-lKhoi6Gq6pNioBGeL75QNHw:1umpGS:VkoXq9SbyhYqvue-q0h5aKipZjlGDd5S5gWB8F0ZZS8",
+    "expire_date": "2025-08-29T02:54:16.104"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "ujuemsoo0o3tai6opa6nlqvx2j968ks5",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO_iGVWxkzQJIxLniJzaUSoKA6EsiLvzUQdY3-cBmddby2vXa54F9oCw-2WFp5NePmJRvuvwNRvsw_HM83LYkr-vcW_vyUXHxk5EXpNIFS8jooRUjWERVyVKclR9JIs-lKhoi6Gq6pNioBGeL75QNHw:1uoCUh:i2U0JlnVL9ZtF-nAbC5Ge8234FLvhWwfqd8u7kgqnoE",
+    "expire_date": "2025-09-01T21:54:39.705"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "vxgcvs123sczox574kkopb3805epr388",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO_iGVWxkzQJIxLniJzaUSoKA6EsiLvzUQdY3-cBmddby2vXa54F9oCw-2WFp5NePmJRvuvwNRvsw_HM83LYkr-vcW_vyUXHxk5EXpNIFS8jooRUjWERVyVKclR9JIs-lKhoi6Gq6pNioBGeL75QNHw:1umpCj:8rXu0H6yPM0_LrkPcld_AIRxTewyA4IpjA5ClyHGEsc",
+    "expire_date": "2025-08-29T02:50:25.565"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "w8ek057dkfe35f1to6meuvjr66qw1s1y",
+  "fields": {
+    "session_data": ".eJxVizEOwjAMRe-SGVUxdmqHEYlzRE7jKhWFgVAWxN0pqANMX3rvv6dLutxrWprd0lTcwYG43S_MOpzt-jGz6cO6r9lg604Xnebjdvnrqra6RryHyIYk4ClzzFEEPYXIPQtgGWL22AuwotkYCILvkWydzCNZie71BpNFMxg:1umpCj:0AAyGsBFZyaqocdmE7FSGwIxuL33qbRdfwtMpx-8q04",
+    "expire_date": "2025-08-29T02:50:25.635"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "xwgx2qxd2avecw9t83qrjlcgordhgohk",
+  "fields": {
+    "session_data": ".eJxVizsOwjAMQO-SGVXOT04YkThH5NiOUlEYCGVB3J2POsD6Pg9TaL31sg69llnM3thkdr-wEp_08jGL0l2nr9ngmI5nmpfDlvx9nUZ_T5C5Ba8MsdaqESOGDImFVSlndk1iTOBtA-vBBiX0DjNWJwGFCczzBe5KNNU:1uoBnu:aqBBbmspS4ctJmU7KL-K-Yghrr8EZWsUFQQ_Lr17D1w",
+    "expire_date": "2025-09-01T21:10:26.680"
+  }
+},
+{
+  "model": "leave.leavetype",
+  "pk": 1,
+  "fields": {
+    "name": "Annual Leave",
+    "description": "Paid annual vacation leave",
+    "max_days_per_year": 21,
+    "requires_approval": true
+  }
+},
+{
+  "model": "leave.leavetype",
+  "pk": 2,
+  "fields": {
+    "name": "Sick Leave",
+    "description": "Medical leave for illness",
+    "max_days_per_year": 14,
+    "requires_approval": false
+  }
+},
+{
+  "model": "leave.leavetype",
+  "pk": 3,
+  "fields": {
+    "name": "Personal Leave",
+    "description": "Personal time off",
+    "max_days_per_year": 5,
+    "requires_approval": true
+  }
+},
+{
+  "model": "leave.specialleavebalance",
+  "pk": 1,
+  "fields": {
+    "employee": 9,
+    "earned": 3.0,
+    "used": 0.0,
+    "year": 2025
+  }
+},
+{
+  "model": "leave.specialleavebalance",
+  "pk": 2,
+  "fields": {
+    "employee": 18,
+    "earned": 0.0,
+    "used": 0.0,
+    "year": 2025
+  }
+},
+{
+  "model": "leave.specialleavebalance",
+  "pk": 3,
+  "fields": {
+    "employee": 1,
+    "earned": 0.0,
+    "used": 0.0,
+    "year": 2025
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 1,
+  "fields": {
+    "employee": 2,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 2,
+  "fields": {
+    "employee": 3,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 3,
+  "fields": {
+    "employee": 4,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 4,
+  "fields": {
+    "employee": 5,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 5,
+  "fields": {
+    "employee": 6,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 6,
+  "fields": {
+    "employee": 7,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 7,
+  "fields": {
+    "employee": 8,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 8,
+  "fields": {
+    "employee": 9,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 9,
+  "fields": {
+    "employee": 10,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 10,
+  "fields": {
+    "employee": 11,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 11,
+  "fields": {
+    "employee": 12,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 12,
+  "fields": {
+    "employee": 13,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 13,
+  "fields": {
+    "employee": 14,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 14,
+  "fields": {
+    "employee": 15,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 15,
+  "fields": {
+    "employee": 16,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "leave.leavebalance",
+  "pk": 16,
+  "fields": {
+    "employee": 17,
+    "leave_type": 1,
+    "year": 2025,
+    "opening_balance": "0.00",
+    "carried_forward": "0.00",
+    "current_year_entitlement": "10.00",
+    "taken": "0.00"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "add_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "change_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "delete_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "view_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "add_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "change_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "delete_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "view_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "add_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "change_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "delete_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "view_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "add_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "change_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "delete_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "view_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "add_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "change_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "delete_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "view_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "add_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "change_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "delete_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "view_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add employee",
+    "content_type": [
+      "leave",
+      "employee"
+    ],
+    "codename": "add_employee"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change employee",
+    "content_type": [
+      "leave",
+      "employee"
+    ],
+    "codename": "change_employee"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete employee",
+    "content_type": [
+      "leave",
+      "employee"
+    ],
+    "codename": "delete_employee"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view employee",
+    "content_type": [
+      "leave",
+      "employee"
+    ],
+    "codename": "view_employee"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add leave type",
+    "content_type": [
+      "leave",
+      "leavetype"
+    ],
+    "codename": "add_leavetype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change leave type",
+    "content_type": [
+      "leave",
+      "leavetype"
+    ],
+    "codename": "change_leavetype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete leave type",
+    "content_type": [
+      "leave",
+      "leavetype"
+    ],
+    "codename": "delete_leavetype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view leave type",
+    "content_type": [
+      "leave",
+      "leavetype"
+    ],
+    "codename": "view_leavetype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add leave application",
+    "content_type": [
+      "leave",
+      "leaveapplication"
+    ],
+    "codename": "add_leaveapplication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change leave application",
+    "content_type": [
+      "leave",
+      "leaveapplication"
+    ],
+    "codename": "change_leaveapplication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete leave application",
+    "content_type": [
+      "leave",
+      "leaveapplication"
+    ],
+    "codename": "delete_leaveapplication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view leave application",
+    "content_type": [
+      "leave",
+      "leaveapplication"
+    ],
+    "codename": "view_leaveapplication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add pending registration",
+    "content_type": [
+      "leave",
+      "pendingregistration"
+    ],
+    "codename": "add_pendingregistration"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change pending registration",
+    "content_type": [
+      "leave",
+      "pendingregistration"
+    ],
+    "codename": "change_pendingregistration"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete pending registration",
+    "content_type": [
+      "leave",
+      "pendingregistration"
+    ],
+    "codename": "delete_pendingregistration"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view pending registration",
+    "content_type": [
+      "leave",
+      "pendingregistration"
+    ],
+    "codename": "view_pendingregistration"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add special work claim",
+    "content_type": [
+      "leave",
+      "specialworkclaim"
+    ],
+    "codename": "add_specialworkclaim"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change special work claim",
+    "content_type": [
+      "leave",
+      "specialworkclaim"
+    ],
+    "codename": "change_specialworkclaim"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete special work claim",
+    "content_type": [
+      "leave",
+      "specialworkclaim"
+    ],
+    "codename": "delete_specialworkclaim"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view special work claim",
+    "content_type": [
+      "leave",
+      "specialworkclaim"
+    ],
+    "codename": "view_specialworkclaim"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add special leave balance",
+    "content_type": [
+      "leave",
+      "specialleavebalance"
+    ],
+    "codename": "add_specialleavebalance"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change special leave balance",
+    "content_type": [
+      "leave",
+      "specialleavebalance"
+    ],
+    "codename": "change_specialleavebalance"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete special leave balance",
+    "content_type": [
+      "leave",
+      "specialleavebalance"
+    ],
+    "codename": "delete_specialleavebalance"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view special leave balance",
+    "content_type": [
+      "leave",
+      "specialleavebalance"
+    ],
+    "codename": "view_specialleavebalance"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add special leave application",
+    "content_type": [
+      "leave",
+      "specialleaveapplication"
+    ],
+    "codename": "add_specialleaveapplication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change special leave application",
+    "content_type": [
+      "leave",
+      "specialleaveapplication"
+    ],
+    "codename": "change_specialleaveapplication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete special leave application",
+    "content_type": [
+      "leave",
+      "specialleaveapplication"
+    ],
+    "codename": "delete_specialleaveapplication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view special leave application",
+    "content_type": [
+      "leave",
+      "specialleaveapplication"
+    ],
+    "codename": "view_specialleaveapplication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add employee import",
+    "content_type": [
+      "leave",
+      "employeeimport"
+    ],
+    "codename": "add_employeeimport"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change employee import",
+    "content_type": [
+      "leave",
+      "employeeimport"
+    ],
+    "codename": "change_employeeimport"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete employee import",
+    "content_type": [
+      "leave",
+      "employeeimport"
+    ],
+    "codename": "delete_employeeimport"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view employee import",
+    "content_type": [
+      "leave",
+      "employeeimport"
+    ],
+    "codename": "view_employeeimport"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add leave balance",
+    "content_type": [
+      "leave",
+      "leavebalance"
+    ],
+    "codename": "add_leavebalance"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change leave balance",
+    "content_type": [
+      "leave",
+      "leavebalance"
+    ],
+    "codename": "change_leavebalance"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete leave balance",
+    "content_type": [
+      "leave",
+      "leavebalance"
+    ],
+    "codename": "delete_leavebalance"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view leave balance",
+    "content_type": [
+      "leave",
+      "leavebalance"
+    ],
+    "codename": "view_leavebalance"
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$GhzbdvUnJis7teTvHfUY0e$aVfY4lml58Nw+KAHtKm4U17AgQXaTOJ8eZ9cqxb7k3U=",
+    "last_login": "2025-08-18T21:54:39.704",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:41:00.569",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "eugene.choy",
+    "first_name": "Eugene",
+    "last_name": "Choy",
+    "email": "eugene.choy@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.048",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "swing.wong",
+    "first_name": "Swing",
+    "last_name": "Wong",
+    "email": "swing.w@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.050",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "adrian.chow",
+    "first_name": "Adrian",
+    "last_name": "Chow",
+    "email": "adrian.chow@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.051",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "cat.tan",
+    "first_name": "Cat",
+    "last_name": "Tan",
+    "email": "cat.tan@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.052",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "catina.yiu",
+    "first_name": "Catina",
+    "last_name": "Yiu",
+    "email": "catina.yiu@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.053",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "cloudy.poon",
+    "first_name": "Cloudy",
+    "last_name": "Poon",
+    "email": "cloudy.poon@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.054",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "danny.ng",
+    "first_name": "Danny",
+    "last_name": "Ng",
+    "email": "danny.ng@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.057",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$xXX5bQgEQZIHER6hFQQEj8$aL/nzgN95Wq690U6Wndvee2Ts9bponW8EGUUDreGTbI=",
+    "last_login": "2025-08-18T21:03:55.451",
+    "is_superuser": false,
+    "username": "ivan.wong",
+    "first_name": "Ivan",
+    "last_name": "Wong",
+    "email": "ivan.wong@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.058",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "jacky.chan",
+    "first_name": "Jacky",
+    "last_name": "Chan",
+    "email": "jacky.chan@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.059",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "jeff.koo",
+    "first_name": "Jeff",
+    "last_name": "Koo",
+    "email": "jeff.koo@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.061",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "milne.man",
+    "first_name": "Milne",
+    "last_name": "Man",
+    "email": "milne.man@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.062",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "sidne.lui",
+    "first_name": "Sidne",
+    "last_name": "Lui",
+    "email": "sidne.lui@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.063",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "ss.tam",
+    "first_name": "SS",
+    "last_name": "Tam",
+    "email": "ss.tam@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.065",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "tim.tan",
+    "first_name": "Tim",
+    "last_name": "Tan",
+    "email": "tim.tan@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.066",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "tom.sin",
+    "first_name": "Tom",
+    "last_name": "Sin",
+    "email": "tom.sin@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.068",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "yw.yeung",
+    "first_name": "YW",
+    "last_name": "Yeung",
+    "email": "yw.yeung@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T00:57:45.069",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$jQe3YBdncmAzRFS6Xgk2Hl$PDFKz7XI593rV4JjTBLlbx0Q5uiKtYKUr8gflnHD6MM=",
+    "last_login": "2025-08-18T21:10:26.679",
+    "is_superuser": true,
+    "username": "magneoh",
+    "first_name": "Mag",
+    "last_name": "Neoh",
+    "email": "maggie@krystal.institute",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-15T02:07:18",
+    "groups": [],
+    "user_permissions": [
+      [
+        "add_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "change_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "delete_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "view_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "add_group",
+        "auth",
+        "group"
+      ],
+      [
+        "change_group",
+        "auth",
+        "group"
+      ],
+      [
+        "delete_group",
+        "auth",
+        "group"
+      ],
+      [
+        "view_group",
+        "auth",
+        "group"
+      ],
+      [
+        "add_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "change_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "delete_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "view_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "add_user",
+        "auth",
+        "user"
+      ],
+      [
+        "change_user",
+        "auth",
+        "user"
+      ],
+      [
+        "delete_user",
+        "auth",
+        "user"
+      ],
+      [
+        "view_user",
+        "auth",
+        "user"
+      ],
+      [
+        "add_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "change_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "delete_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "view_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "add_employee",
+        "leave",
+        "employee"
+      ],
+      [
+        "change_employee",
+        "leave",
+        "employee"
+      ],
+      [
+        "delete_employee",
+        "leave",
+        "employee"
+      ],
+      [
+        "view_employee",
+        "leave",
+        "employee"
+      ],
+      [
+        "add_employeeimport",
+        "leave",
+        "employeeimport"
+      ],
+      [
+        "change_employeeimport",
+        "leave",
+        "employeeimport"
+      ],
+      [
+        "delete_employeeimport",
+        "leave",
+        "employeeimport"
+      ],
+      [
+        "view_employeeimport",
+        "leave",
+        "employeeimport"
+      ],
+      [
+        "add_leaveapplication",
+        "leave",
+        "leaveapplication"
+      ],
+      [
+        "change_leaveapplication",
+        "leave",
+        "leaveapplication"
+      ],
+      [
+        "delete_leaveapplication",
+        "leave",
+        "leaveapplication"
+      ],
+      [
+        "view_leaveapplication",
+        "leave",
+        "leaveapplication"
+      ],
+      [
+        "add_leavebalance",
+        "leave",
+        "leavebalance"
+      ],
+      [
+        "change_leavebalance",
+        "leave",
+        "leavebalance"
+      ],
+      [
+        "delete_leavebalance",
+        "leave",
+        "leavebalance"
+      ],
+      [
+        "view_leavebalance",
+        "leave",
+        "leavebalance"
+      ],
+      [
+        "add_leavetype",
+        "leave",
+        "leavetype"
+      ],
+      [
+        "change_leavetype",
+        "leave",
+        "leavetype"
+      ],
+      [
+        "delete_leavetype",
+        "leave",
+        "leavetype"
+      ],
+      [
+        "view_leavetype",
+        "leave",
+        "leavetype"
+      ],
+      [
+        "add_pendingregistration",
+        "leave",
+        "pendingregistration"
+      ],
+      [
+        "change_pendingregistration",
+        "leave",
+        "pendingregistration"
+      ],
+      [
+        "delete_pendingregistration",
+        "leave",
+        "pendingregistration"
+      ],
+      [
+        "view_pendingregistration",
+        "leave",
+        "pendingregistration"
+      ],
+      [
+        "add_specialleaveapplication",
+        "leave",
+        "specialleaveapplication"
+      ],
+      [
+        "change_specialleaveapplication",
+        "leave",
+        "specialleaveapplication"
+      ],
+      [
+        "delete_specialleaveapplication",
+        "leave",
+        "specialleaveapplication"
+      ],
+      [
+        "view_specialleaveapplication",
+        "leave",
+        "specialleaveapplication"
+      ],
+      [
+        "add_specialleavebalance",
+        "leave",
+        "specialleavebalance"
+      ],
+      [
+        "change_specialleavebalance",
+        "leave",
+        "specialleavebalance"
+      ],
+      [
+        "delete_specialleavebalance",
+        "leave",
+        "specialleavebalance"
+      ],
+      [
+        "view_specialleavebalance",
+        "leave",
+        "specialleavebalance"
+      ],
+      [
+        "add_specialworkclaim",
+        "leave",
+        "specialworkclaim"
+      ],
+      [
+        "change_specialworkclaim",
+        "leave",
+        "specialworkclaim"
+      ],
+      [
+        "delete_specialworkclaim",
+        "leave",
+        "specialworkclaim"
+      ],
+      [
+        "view_specialworkclaim",
+        "leave",
+        "specialworkclaim"
+      ],
+      [
+        "add_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "change_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "delete_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "view_session",
+        "sessions",
+        "session"
+      ]
+    ]
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "admin"
+    ],
+    "employee_id": "ADMIN001",
+    "department": "Administration",
+    "position": "System Administrator",
+    "company": "Krystal Institute Ltd",
+    "date_joined": null,
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "eugene.choy"
+    ],
+    "employee_id": "EMP0002",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "swing.wong"
+    ],
+    "employee_id": "EMP0003",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "adrian.chow"
+    ],
+    "employee_id": "EMP0004",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "cat.tan"
+    ],
+    "employee_id": "EMP0005",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "catina.yiu"
+    ],
+    "employee_id": "EMP0006",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "cloudy.poon"
+    ],
+    "employee_id": "EMP0007",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "CN"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 8,
+  "fields": {
+    "user": [
+      "danny.ng"
+    ],
+    "employee_id": "EMP0008",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 9,
+  "fields": {
+    "user": [
+      "ivan.wong"
+    ],
+    "employee_id": "EMP0009",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 10,
+  "fields": {
+    "user": [
+      "jacky.chan"
+    ],
+    "employee_id": "EMP0010",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 11,
+  "fields": {
+    "user": [
+      "jeff.koo"
+    ],
+    "employee_id": "EMP0011",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 12,
+  "fields": {
+    "user": [
+      "milne.man"
+    ],
+    "employee_id": "EMP0012",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 13,
+  "fields": {
+    "user": [
+      "sidne.lui"
+    ],
+    "employee_id": "EMP0013",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 14,
+  "fields": {
+    "user": [
+      "ss.tam"
+    ],
+    "employee_id": "EMP0014",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 15,
+  "fields": {
+    "user": [
+      "tim.tan"
+    ],
+    "employee_id": "EMP0015",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 16,
+  "fields": {
+    "user": [
+      "tom.sin"
+    ],
+    "employee_id": "EMP0016",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 17,
+  "fields": {
+    "user": [
+      "yw.yeung"
+    ],
+    "employee_id": "EMP0017",
+    "department": "General",
+    "position": "Staff",
+    "company": "Krystal Institute Ltd",
+    "date_joined": "2020-08-01",
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.employee",
+  "pk": 18,
+  "fields": {
+    "user": [
+      "magneoh"
+    ],
+    "employee_id": "MGR001",
+    "department": "Management",
+    "position": "Manager",
+    "company": "Krystal Institute Ltd",
+    "date_joined": null,
+    "region": "HK"
+  }
+},
+{
+  "model": "leave.leaveapplication",
+  "pk": 1,
+  "fields": {
+    "employee": 9,
+    "leave_type": 1,
+    "date_from": "2025-08-20T09:00:00",
+    "date_to": "2025-08-22T18:00:00",
+    "reason": "Test leave application",
+    "status": "pending",
+    "created_at": "2025-08-15T01:15:01.097",
+    "updated_at": "2025-08-15T01:15:01.097",
+    "approved_by": null,
+    "approved_at": null
+  }
+},
+{
+  "model": "leave.leaveapplication",
+  "pk": 2,
+  "fields": {
+    "employee": 9,
+    "leave_type": 1,
+    "date_from": "2025-08-20T09:00:00",
+    "date_to": "2025-08-21T18:00:00",
+    "reason": "Test session-based leave application",
+    "status": "pending",
+    "created_at": "2025-08-15T01:30:32.527",
+    "updated_at": "2025-08-15T01:30:32.527",
+    "approved_by": null,
+    "approved_at": null
+  }
+},
+{
+  "model": "leave.leaveapplication",
+  "pk": 3,
+  "fields": {
+    "employee": 9,
+    "leave_type": 3,
+    "date_from": "2025-08-22T14:00:00",
+    "date_to": "2025-08-22T18:00:00",
+    "reason": "PM only leave test",
+    "status": "pending",
+    "created_at": "2025-08-15T01:30:45.022",
+    "updated_at": "2025-08-15T01:30:45.022",
+    "approved_by": null,
+    "approved_at": null
+  }
+},
+{
+  "model": "leave.leaveapplication",
+  "pk": 4,
+  "fields": {
+    "employee": 9,
+    "leave_type": 1,
+    "date_from": "2025-09-08T09:00:00",
+    "date_to": "2025-09-08T13:00:00",
+    "reason": "Attending examination",
+    "status": "pending",
+    "created_at": "2025-08-15T01:32:45.648",
+    "updated_at": "2025-08-15T01:32:45.648",
+    "approved_by": null,
+    "approved_at": null
+  }
+},
+{
+  "model": "leave.leaveapplication",
+  "pk": 5,
+  "fields": {
+    "employee": 9,
+    "leave_type": 1,
+    "date_from": "2025-09-08T09:00:00",
+    "date_to": "2025-09-08T13:00:00",
+    "reason": "Attending examination",
+    "status": "pending",
+    "created_at": "2025-08-15T01:36:33.379",
+    "updated_at": "2025-08-15T01:36:33.379",
+    "approved_by": null,
+    "approved_at": null
+  }
+},
+{
+  "model": "leave.leaveapplication",
+  "pk": 6,
+  "fields": {
+    "employee": 9,
+    "leave_type": 1,
+    "date_from": "2025-09-08T09:00:00",
+    "date_to": "2025-09-08T13:00:00",
+    "reason": "Attending exam",
+    "status": "pending",
+    "created_at": "2025-08-15T01:47:19.868",
+    "updated_at": "2025-08-15T01:47:19.869",
+    "approved_by": null,
+    "approved_at": null
+  }
+},
+{
+  "model": "leave.leaveapplication",
+  "pk": 7,
+  "fields": {
+    "employee": 9,
+    "leave_type": 1,
+    "date_from": "2025-08-27T09:00:00",
+    "date_to": "2025-08-29T18:00:00",
+    "reason": "Leave",
+    "status": "pending",
+    "created_at": "2025-08-15T01:53:22.090",
+    "updated_at": "2025-08-15T01:53:22.090",
+    "approved_by": null,
+    "approved_at": null
+  }
+},
+{
+  "model": "leave.leaveapplication",
+  "pk": 8,
+  "fields": {
+    "employee": 9,
+    "leave_type": 1,
+    "date_from": "2025-08-16T09:00:00",
+    "date_to": "2025-08-16T13:00:00",
+    "reason": "Testing superuser approval functionality",
+    "status": "approved",
+    "created_at": "2025-08-15T02:40:09.704",
+    "updated_at": "2025-08-15T02:42:01.413",
+    "approved_by": [
+      "admin"
+    ],
+    "approved_at": "2025-08-15T02:42:01.413"
+  }
+},
+{
+  "model": "leave.leaveapplication",
+  "pk": 9,
+  "fields": {
+    "employee": 9,
+    "leave_type": 1,
+    "date_from": "2025-09-08T09:00:00",
+    "date_to": "2025-09-08T13:00:00",
+    "reason": "Attending Examination",
+    "status": "pending",
+    "created_at": "2025-08-18T04:18:43.538",
+    "updated_at": "2025-08-18T04:18:43.538",
+    "approved_by": null,
+    "approved_at": null
+  }
+},
+{
+  "model": "leave.specialworkclaim",
+  "pk": 1,
+  "fields": {
+    "employee": 9,
+    "work_date": "2025-08-06",
+    "work_end_date": "2025-08-08",
+    "session": "FULL",
+    "event_name": "portal development",
+    "description": "Working on holiday",
+    "priority": "high",
+    "status": "approved",
+    "credits_earned": 3.0,
+    "created_at": "2025-08-15T02:04:53.716",
+    "updated_at": "2025-08-15T02:42:16.454",
+    "approved_by": [
+      "magneoh"
+    ],
+    "approved_at": "2025-08-15T02:42:16.454",
+    "manager_comment": "Approved by superuser test"
+  }
+},
+{
+  "model": "leave.pendingregistration",
+  "pk": 1,
+  "fields": {
+    "email": "ivan.wong@krystal.institute",
+    "first_name": "Ivan",
+    "last_name": "Wong",
+    "other_name": "",
+    "office_location": "HK",
+    "status": "pending",
+    "created_at": "2025-08-15T00:51:33.194",
+    "reviewed_at": null,
+    "reviewed_by": null,
+    "rejection_reason": ""
+  }
+},
+{
+  "model": "leave.employeeimport",
+  "pk": 1,
+  "fields": {
+    "file_name": "test_staff_list_fixed.csv",
+    "uploaded_by": [
+      "admin"
+    ],
+    "upload_date": "2025-08-18T20:56:41.837",
+    "status": "processing",
+    "total_rows": 0,
+    "created_count": 0,
+    "updated_count": 0,
+    "error_count": 0,
+    "import_log": "",
+    "csv_content": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2025-08-15T02:07:18.945",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "object_id": "18",
+    "object_repr": "magneoh",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2025-08-15T02:09:00.433",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "object_id": "18",
+    "object_repr": "magneoh",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"First name\", \"Last name\", \"Email address\", \"Superuser status\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 3,
+  "fields": {
+    "action_time": "2025-08-15T02:10:26.582",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "object_id": "18",
+    "object_repr": "magneoh",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Staff status\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 4,
+  "fields": {
+    "action_time": "2025-08-15T02:16:18.398",
+    "user": [
+      "magneoh"
+    ],
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "object_id": "18",
+    "object_repr": "magneoh",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"User permissions\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 5,
+  "fields": {
+    "action_time": "2025-08-18T21:08:05.093",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "object_id": "18",
+    "object_repr": "magneoh",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"User permissions\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 6,
+  "fields": {
+    "action_time": "2025-08-18T21:09:00.704",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "object_id": "18",
+    "object_repr": "magneoh",
+    "action_flag": 2,
+    "change_message": "[]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 7,
+  "fields": {
+    "action_time": "2025-08-18T21:10:03.022",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "object_id": "18",
+    "object_repr": "magneoh",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"password\"]}}]"
+  }
+}
+]
