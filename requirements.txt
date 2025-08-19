@@ -1,5 +1,5 @@
 asgiref==3.8.1
-backports.zoneinfo==0.2.1
+# backports.zoneinfo==0.2.1  # Not needed for Python 3.9+
 certifi==2025.7.14
 cffi==1.17.1
 charset-normalizer==3.4.2
