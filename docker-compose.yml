@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  # Company Leave Management System - Web Application
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: company-leave-system
+    restart: unless-stopped
+    ports:
+      - "8082:8000"
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-django-insecure-change-this-in-production}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-False}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,0.0.0.0,*}
+      - EMAIL_HOST=${EMAIL_HOST:-smtp.yourcompany.com}
+      - EMAIL_PORT=${EMAIL_PORT:-587}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-your-email@yourcompany.com}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-your-email-password}
+      - SMS_GATEWAY_API_KEY=${SMS_GATEWAY_API_KEY:-your-sms-api-key}
+      - PUSHER_APP_ID=${PUSHER_APP_ID:-your-pusher-app-id}
+      - PUSHER_KEY=${PUSHER_KEY:-your-pusher-key}
+      - PUSHER_SECRET=${PUSHER_SECRET:-your-pusher-secret}
+      - PUSHER_CLUSTER=${PUSHER_CLUSTER:-your-pusher-cluster}
+      - PORT=8000
+    volumes:
+      # Persist database
+      - ./data/db:/app/db.sqlite3
+      # Persist media files
+      - ./data/media:/app/media
+      # Persist logs
+      - ./data/logs:/app/logs
+      # Mount dataset files
+      - ./staff_list.csv:/app/staff_list.csv:ro
+      - ./sample_employees.csv:/app/sample_employees.csv:ro
+      - ./company_leave_system_data.json:/app/company_leave_system_data.json:ro
+    networks:
+      - leave-system-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/login/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - db-backup
+
+  # Optional: Database backup service
+  db-backup:
+    image: alpine:latest
+    container_name: leave-system-backup
+    restart: unless-stopped
+    volumes:
+      - ./data/db:/data
+      - ./backups:/backups
+    command: |
+      sh -c "
+        while true; do
+          echo 'Creating database backup...'
+          timestamp=$$(date +%Y%m%d_%H%M%S)
+          cp /data/db.sqlite3 /backups/db_backup_$$timestamp.sqlite3 2>/dev/null || echo 'No database to backup yet'
+          echo 'Backup created: db_backup_$$timestamp.sqlite3'
+          # Keep only last 7 days of backups
+          find /backups -name 'db_backup_*.sqlite3' -mtime +7 -delete 2>/dev/null || true
+          sleep 86400  # Backup every 24 hours
+        done
+      "
+    networks:
+      - leave-system-network
+
+  # Nginx reverse proxy (optional, for production)
+  nginx:
+    image: nginx:alpine
+    container_name: leave-system-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./data/media:/var/www/media:ro
+    depends_on:
+      - web
+    networks:
+      - leave-system-network
+    profiles:
+      - production
+
+networks:
+  leave-system-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  media_data:
+  backup_data:

@@ -1,0 +1,97 @@
+# Docker ignore file for Company Leave Management System
+
+# Virtual environments
+venv/
+env/
+.env.local
+.env.production
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+*.log
+local_settings.py
+settings_local.py
+
+# Database (we'll handle this separately)
+*.sqlite3-journal
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Logs
+*.log
+logs/
+
+# Documentation that's not needed in container
+*.md
+!README.md
+
+# Backup files
+*.backup
+*.bak
+*.zip
+
+# Test files
+test_*.py
+*_test.py
+
+# Development tools
+.coverage
+.pytest_cache/
+.tox/
+.coverage.*
+htmlcov/
+.nyc_output
+
+# Package files
+*.tar.gz
+*.tar.bz2
+
+# Certificate files (handled separately)
+*.pem
+*.key
+*.crt
