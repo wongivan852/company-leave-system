@@ -45,7 +45,7 @@
         <div>
             <strong>Total Duration:</strong><br>
             <span style="font-size: 18px; color: #e74c3c; font-weight: bold;">{{ application_data.days_applied }} 
-            {% if application_data.days_applied > 1 %}days{% else %}day{% endif %}</span>
+            {% if application_data.days_applied <= 1 %}day{% else %}days{% endif %}</span>
         </div>
         <div>
             <strong>Credits Used:</strong><br>

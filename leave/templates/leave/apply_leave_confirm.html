@@ -43,7 +43,8 @@
     
     <div style="margin-bottom: 15px;">
         <strong>Total Duration:</strong><br>
-        <span style="font-size: 18px; color: #e74c3c; font-weight: bold;">{{ application_data.days_applied }} days</span>
+        <span style="font-size: 18px; color: #e74c3c; font-weight: bold;">{{ application_data.days_applied }} 
+        {% if application_data.days_applied <= 1 %}day{% else %}days{% endif %}</span>
         {% if application_data.includes_saturday_work %}
             <br><small style="color: #856404;">
                 ({{ business_days }} business days + {{ application_data.saturday_work_days }} Saturday working days)

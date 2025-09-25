@@ -31,7 +31,7 @@
                     {% if application.leave_type.name == "Annual Leave" %}
                         {{ application.date_from|date:"d/m/Y" }} ({{ application.date_from|date:"D" }})<br>
                         <small>
-                            {% if application.date_from|date:"H" < "13" %}
+                            {% if application.date_from.hour < 13 %}
                                 9:00am - 1:00pm
                             {% else %}
                                 2:00pm - 6:00pm
@@ -43,7 +43,7 @@
                     {% if application.leave_type.name == "Annual Leave" %}
                         {{ application.date_to|date:"d/m/Y" }} ({{ application.date_to|date:"D" }})<br>
                         <small>
-                            {% if application.date_to|date:"H" < "13" %}
+                            {% if application.date_to.hour <= 13 %}
                                 9:00am - 1:00pm
                             {% else %}
                                 2:00pm - 6:00pm
@@ -61,7 +61,7 @@
                     {% if application.leave_type.name == "Sick Leave" %}
                         {{ application.date_from|date:"d/m/Y" }} ({{ application.date_from|date:"D" }})<br>
                         <small>
-                            {% if application.date_from|date:"H" < "13" %}
+                            {% if application.date_from.hour < 13 %}
                                 9:00am - 1:00pm
                             {% else %}
                                 2:00pm - 6:00pm
@@ -73,7 +73,7 @@
                     {% if application.leave_type.name == "Sick Leave" %}
                         {{ application.date_to|date:"d/m/Y" }} ({{ application.date_to|date:"D" }})<br>
                         <small>
-                            {% if application.date_to|date:"H" < "13" %}
+                            {% if application.date_to.hour <= 13 %}
                                 9:00am - 1:00pm
                             {% else %}
                                 2:00pm - 6:00pm
@@ -91,7 +91,7 @@
                     {% if application.leave_type.name == "No Paid Leave" %}
                         {{ application.date_from|date:"d/m/Y" }} ({{ application.date_from|date:"D" }})<br>
                         <small>
-                            {% if application.date_from|date:"H" < "13" %}
+                            {% if application.date_from.hour < 13 %}
                                 9:00am - 1:00pm
                             {% else %}
                                 2:00pm - 6:00pm
@@ -103,7 +103,7 @@
                     {% if application.leave_type.name == "No Paid Leave" %}
                         {{ application.date_to|date:"d/m/Y" }} ({{ application.date_to|date:"D" }})<br>
                         <small>
-                            {% if application.date_to|date:"H" < "13" %}
+                            {% if application.date_to.hour <= 13 %}
                                 9:00am - 1:00pm
                             {% else %}
                                 2:00pm - 6:00pm
@@ -133,7 +133,8 @@
     <div class="form-row-a5">
         <span class="form-label-a5">Total Period</span>
         <div class="form-value-a5">
-            {{ application.days_applied }} day{{ application.days_applied|pluralize }}
+            {{ application.days_applied }} 
+            {% if application.days_applied <= 1 %}day{% else %}days{% endif %}
         </div>
     </div>
     

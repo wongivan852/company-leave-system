@@ -28,7 +28,8 @@
                         <div class="col-md-6">
                             <p><strong>Start Time:</strong> {{ application.date_from|time:"g:i A" }}</p>
                             <p><strong>End Time:</strong> {{ application.date_to|time:"g:i A" }}</p>
-                            <p><strong>Duration:</strong> {{ application.days_applied }} day{{ application.days_applied|pluralize }}</p>
+                            <p><strong>Duration:</strong> {{ application.days_applied }} 
+                            {% if application.days_applied <= 1 %}day{% else %}days{% endif %}</p>
                         </div>
                     </div>
                     

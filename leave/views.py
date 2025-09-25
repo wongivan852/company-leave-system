@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.http import HttpResponse
 from django.template.loader import get_template
@@ -29,11 +29,15 @@ def is_staff_or_manager(user):
 
 def calculate_return_date(date_to):
     """Calculate the return to work date based on the leave end date."""
-    # If leave ends in the morning (before 1 PM), return same day afternoon
+    # For half-day leaves ending at 1:00pm (13:00), return to work same day at 2:00pm
+    if date_to.hour == 13:
+        return date_to.date()
+    
+    # For morning leaves ending before 1:00pm, return same day afternoon
     if date_to.hour < 13:
         return date_to.date()
     
-    # If leave ends in the afternoon, return next working day morning
+    # If leave ends in the afternoon (after 1:00pm), return next working day morning
     next_day = date_to.date() + timedelta(days=1)
     
     # Skip weekends
@@ -692,11 +696,136 @@ def holiday_delete(request, holiday_id):
 
 @login_required
 def combined_print(request):
-    return render(request, 'leave/combined_print.html', {'message': 'Feature coming soon'})
+    """Combined print view for printing 2 applications on one A4 page"""
+    ids_param = request.GET.get('ids', '')
+    
+    if not ids_param:
+        messages.error(request, 'No applications selected for combined printing.')
+        return redirect('leave:leave_applications')
+    
+    # Parse application IDs
+    try:
+        app_ids = [int(id_str.strip()) for id_str in ids_param.split(',') if id_str.strip()]
+    except ValueError:
+        messages.error(request, 'Invalid application IDs provided.')
+        return redirect('leave:leave_applications')
+    
+    if not app_ids:
+        messages.error(request, 'No valid application IDs provided.')
+        return redirect('leave:leave_applications')
+    
+    # Get applications (limit to 2 for combined printing)
+    applications = []
+    dates_back_to_work = []
+    
+    for app_id in app_ids[:2]:  # Only take first 2 applications
+        try:
+            app = LeaveApplication.objects.get(pk=app_id)
+            # Check if user has permission to view this application
+            if not request.user.is_staff and app.employee.user != request.user:
+                messages.error(request, f'You do not have permission to view application {app_id}.')
+                return redirect('leave:leave_applications')
+            
+            applications.append(app)
+            dates_back_to_work.append(calculate_return_date(app.date_to))
+        except LeaveApplication.DoesNotExist:
+            messages.warning(request, f'Application {app_id} not found.')
+    
+    if not applications:
+        messages.error(request, 'No valid applications found for printing.')
+        return redirect('leave:leave_applications')
+    
+    # Pad with None if less than 2 applications
+    while len(applications) < 2:
+        applications.append(None)
+        dates_back_to_work.append(None)
+    
+    context = {
+        'applications': applications,
+        'dates_back_to_work': dates_back_to_work,
+        'application_ids_param': ids_param,
+        'is_pdf': False,
+    }
+    
+    return render(request, 'leave/combined_print.html', context)
 
 @login_required
 def combined_print_pdf(request):
-    return HttpResponse('Feature coming soon - PDF generation')
+    """Generate PDF for combined applications"""
+    ids_param = request.GET.get('ids', '')
+    
+    if not ids_param:
+        messages.error(request, 'No applications selected for PDF generation.')
+        return redirect('leave:leave_applications')
+    
+    # Parse application IDs
+    try:
+        app_ids = [int(id_str.strip()) for id_str in ids_param.split(',') if id_str.strip()]
+    except ValueError:
+        messages.error(request, 'Invalid application IDs provided.')
+        return redirect('leave:leave_applications')
+    
+    if not app_ids:
+        messages.error(request, 'No valid application IDs provided.')
+        return redirect('leave:leave_applications')
+    
+    # Get applications (limit to 2 for combined printing)
+    applications = []
+    dates_back_to_work = []
+    
+    for app_id in app_ids[:2]:  # Only take first 2 applications
+        try:
+            app = LeaveApplication.objects.get(pk=app_id)
+            # Check if user has permission to view this application
+            if not request.user.is_staff and app.employee.user != request.user:
+                messages.error(request, f'You do not have permission to view application {app_id}.')
+                return redirect('leave:leave_applications')
+            
+            applications.append(app)
+            dates_back_to_work.append(calculate_return_date(app.date_to))
+        except LeaveApplication.DoesNotExist:
+            messages.warning(request, f'Application {app_id} not found.')
+    
+    if not applications:
+        messages.error(request, 'No valid applications found for PDF generation.')
+        return redirect('leave:leave_applications')
+    
+    # Pad with None if less than 2 applications
+    while len(applications) < 2:
+        applications.append(None)
+        dates_back_to_work.append(None)
+    
+    template = get_template('leave/combined_print.html')
+    context = {
+        'applications': applications,
+        'dates_back_to_work': dates_back_to_work,
+        'application_ids_param': ids_param,
+        'is_pdf': True,
+    }
+    html = template.render(context)
+    
+    try:
+        # Try to generate PDF using weasyprint if available
+        import weasyprint
+        pdf_file = weasyprint.HTML(string=html).write_pdf()
+        
+        # Create filename with employee names
+        employee_names = []
+        for app in applications:
+            if app:
+                name = app.employee.user.get_full_name().replace(" ", "_")
+                employee_names.append(name)
+        
+        filename = f'combined_leave_applications_{"_".join(employee_names)}.pdf'
+        
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        return response
+    except ImportError:
+        # If weasyprint is not available, redirect to print view with warning
+        messages.warning(request, 'PDF generation is not available. Please use the print function instead.')
+        return redirect(f"{reverse('leave:combined_print')}?ids={ids_param}")
 
 # Manager Approval Views
 @user_passes_test(is_manager)

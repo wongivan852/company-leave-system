@@ -419,7 +419,7 @@
                 <span class="form-label">Total Leave Period</span>
                 <div class="form-value">
                     {{ application.days_applied }} 
-                    {% if application.days_applied > 1 %}days{% else %}day{% endif %}
+                    {% if application.days_applied <= 1 %}day{% else %}days{% endif %}
                 </div>
             </div>
         </div>
